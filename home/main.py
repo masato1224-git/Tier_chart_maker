@@ -27,28 +27,28 @@ def generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_
     draw.text(
         (950, 30),
         title,
-        fill=title_color,
-        font=title_font,
-        stroke_width=text_weight,
-        stroke_fill=title_color,
+        fill = title_color,
+        font = title_font,
+        stroke_width = text_weight,
+        stroke_fill = title_color,
     )
     
     # 2. 軸ラベルを描画
     draw.text(
         (50, 100),
         f"Y: {y_label}",
-        fill=y_color,
-        font=axis_font,
-        stroke_width=text_weight,
-        stroke_fill=y_color,
+        fill = y_color,
+        font = axis_font,
+        stroke_width = text_weight,
+        stroke_fill = y_color,
     )
     draw.text(
         (600, 750),
         f"X: {x_label}",
-        fill=x_color,
-        font=axis_font,
-        stroke_width=text_weight,
-        stroke_fill=x_color,
+        fill = x_color,
+        font = axis_font,
+        stroke_width = text_weight,
+        stroke_fill = x_color,
     )
     
     # 3. アップロードされた画像を配置
@@ -81,17 +81,8 @@ def index():
         files = request.files.getlist('images')
         
         # 画像生成
-        result_img = generate_tier_image(
-            files,
-            title,
-            title_color,
-            x_label,
-            x_color,
-            y_label,
-            y_color,
-            text_weight=text_weight,
-            bg_file=bg_file,
-        )
+        result_img = generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_color,
+            text_weight=text_weight, bg_file=bg_file )
         
         # ブラウザ表示用にbase64エンコード
         buf = io.BytesIO()
