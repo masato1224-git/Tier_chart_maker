@@ -33,7 +33,7 @@
                 次に、Tier表に置く画像を1つずつ追加してください。
             </div>
             
-            <form method="POST" enctype="multipart/form-data" id="imageForm">
+            <form method="POST" action="{{ url_for('place_images') }}" enctype="multipart/form-data" id="imageForm">
                 <div class="form-group">
                     <label>画像を選択:</label>
                     <input type="file" name="image" accept="image/*" id="imageInput">
@@ -48,7 +48,7 @@
                 </div>
             </div>
             
-            <form method="POST">
+            <form method="POST" action="{{ url_for('place_images') }}">
                 <button type="submit" name="generate" value="1" style="background: #ff9800;">完了 → 最終結果を表示</button>
             </form>
             
