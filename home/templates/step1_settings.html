@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Tier Maker - 設定</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .form-group { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        label { display: inline-block; width: 120px; font-weight: bold; }
+        input[type="text"], input[type="color"], input[type="file"], input[type="range"] { padding: 5px; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Tier表メーカー - ステップ1: 設定</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>タイトル:</label>
+            <input type="text" name="title" value="My Best Games" required>
+            <label>色:</label>
+            <input type="color" name="title_color" value="#ffffff">
+        </div>
+        <div class="form-group">
+            <label>文字の太さ:</label>
+            <input type="range" name="text_weight" id="text_weight" min="0" max="10" value="1">
+            <span id="text_weight_value">1</span>
+        </div>
+        <div class="form-group">
+            <label>縦軸ラベル:</label>
+            <input type="text" name="y_label" value="Quality">
+            <label>色:</label>
+            <input type="color" name="y_color" value="#ff0000">
+        </div>
+
+        <div class="form-group">
+            <label>横軸ラベル:</label>
+            <input type="text" name="x_label" value="Enjoyment">
+            <label>色:</label>
+            <input type="color" name="x_color" value="#00ff00">
+        </div>
+        <div class="form-group">
+            <label>背景画像:</label>
+            <input type="file" name="bg_file" accept="image/*">
+        </div>
+        <button type="submit">次へ進む → 画像配置ページ</button>
+    </form>
+    <script>
+        const weightInput = document.getElementById('text_weight');
+        const weightValue = document.getElementById('text_weight_value');
+        weightInput.addEventListener('input', () => {
+            weightValue.textContent = weightInput.value;
+        });
+    </script>
+</body>
+</html>

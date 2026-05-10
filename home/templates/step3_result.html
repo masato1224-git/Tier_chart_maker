@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Tier Maker - 結果</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .preview { border: 2px solid #333; max-width: 100%; margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; margin-right: 10px; }
+        button:hover { background: #45a049; }
+        button.secondary { background: #2196F3; }
+        button.secondary:hover { background: #0b7dda; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Tier表メーカー - 完成!</h1>
+    
+    <h2>生成結果:</h2>
+    <img src="data:image/png;base64,{{ img_data }}" class="preview" alt="生成結果">
+    
+    <div>
+        <a href="data:image/png;base64,{{ img_data }}" download="tier_list.png">
+            <button>画像をダウンロード</button>
+        </a>
+        <a href="{{ url_for('index') }}">
+            <button class="secondary">新しく作成</button>
+        </a>
+    </div>
+</body>
+</html>

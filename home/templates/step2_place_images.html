@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Tier Maker - 画像配置</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .container { display: flex; gap: 20px; }
+        .form-section { flex: 1; }
+        .preview-section { flex: 1; }
+        .form-group { margin-bottom: 15px; padding-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="file"] { padding: 8px; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #45a049; }
+        button.secondary { background: #2196F3; }
+        button.secondary:hover { background: #0b7dda; }
+        .preview { border: 2px solid #333; max-width: 100%; margin-top: 10px; }
+        .image-list { margin-top: 20px; }
+        .image-item { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .image-item button { margin: 0; padding: 5px 10px; font-size: 12px; }
+        h1 { color: #333; }
+        .info { background: #e3f2fd; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Tier表メーカー - ステップ2: 画像配置</h1>
+    
+    <div class="container">
+        <div class="form-section">
+            <div class="info">
+                設定が完了しました。<br>
+                次に、Tier表に置く画像を1つずつ追加してください。
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" id="imageForm">
+                <div class="form-group">
+                    <label>画像を選択:</label>
+                    <input type="file" name="image" accept="image/*" id="imageInput">
+                </div>
+                <button type="submit" class="secondary">画像を追加</button>
+            </form>
+            
+            <div class="image-list">
+                <h3>追加済み画像 ({{ image_count }}個)</h3>
+                <div id="imageListContainer">
+                    <!-- 動的に追加 -->
+                </div>
+            </div>
+            
+            <form method="POST">
+                <button type="submit" name="generate" value="1" style="background: #ff9800;">完了 → 最終結果を表示</button>
+            </form>
+            
+            <form action="{{ url_for('index') }}" style="margin-top: 20px;">
+                <button type="submit" style="background: #f44336;">最初からやり直す</button>
+            </form>
+        </div>
+        
+        <div class="preview-section">
+            <h3>プレビュー</h3>
+            <img src="/preview_image" class="preview" alt="プレビュー">
+            <p style="font-size: 12px; color: #666;">※ 実際のTier表です。画像を追加するたびに更新されます。</p>
+        </div>
+    </div>
+    
+    <script>
+        // ページロード時に画像リストを表示
+        document.addEventListener('DOMContentLoaded', () => {
+            updateImageList();
+        });
+        
+        // 画像追加フォーム送信
+        document.getElementById('imageForm').addEventListener('submit', (e) => {
+            const fileInput = document.getElementById('imageInput');
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                alert('画像を選択してください');
+                return;
+            }
+        });
+        
+        function updateImageList() {
+            // サーバーから画像リスト情報を取得して表示
+            fetch('/api/image_list')
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('imageListContainer');
+                    container.innerHTML = '';
+                    data.images.forEach((img, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'image-item';
+                        item.innerHTML = `<span>画像 ${idx + 1}</span><button type="button" onclick="removeImage(${idx})" class="secondary">削除</button>`;
+                        container.appendChild(item);
+                    });
+                });
+        }
+        
+        function removeImage(idx) {
+            fetch(`/api/remove_image/${idx}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        updateImageList();
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
