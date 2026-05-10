@@ -18,27 +18,32 @@
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label>タイトル:</label>
-            <input type="text" name="title" value="My Best Games" required>
+            <input type="text" name="title" value="{{ title }}" required>
             <label>色:</label>
-            <input type="color" name="title_color" value="#ffffff">
+            <input type="color" name="title_color" value="{{ title_color }}">
         </div>
         <div class="form-group">
             <label>文字の太さ:</label>
-            <input type="range" name="text_weight" id="text_weight" min="0" max="10" value="1">
-            <span id="text_weight_value">1</span>
+            <input type="range" name="text_weight" id="text_weight" min="0" max="10" value="{{ text_weight }}">
+            <span id="text_weight_value">{{ text_weight }}</span>
+        </div>
+        <div class="form-group">
+            <label>文字サイズ:</label>
+            <input type="range" name="text_size" id="text_size" min="16" max="72" value="{{ text_size }}">
+            <span id="text_size_value">{{ text_size }}</span>px
         </div>
         <div class="form-group">
             <label>縦軸ラベル:</label>
-            <input type="text" name="y_label" value="Quality">
+            <input type="text" name="y_label" value="{{ y_label }}">
             <label>色:</label>
-            <input type="color" name="y_color" value="#ff0000">
+            <input type="color" name="y_color" value="{{ y_color }}">
         </div>
 
         <div class="form-group">
             <label>横軸ラベル:</label>
-            <input type="text" name="x_label" value="Enjoyment">
+            <input type="text" name="x_label" value="{{ x_label }}">
             <label>色:</label>
-            <input type="color" name="x_color" value="#00ff00">
+            <input type="color" name="x_color" value="{{ x_color }}">
         </div>
         <div class="form-group">
             <label>背景画像:</label>
@@ -49,8 +54,14 @@
     <script>
         const weightInput = document.getElementById('text_weight');
         const weightValue = document.getElementById('text_weight_value');
+        const sizeInput = document.getElementById('text_size');
+        const sizeValue = document.getElementById('text_size_value');
+
         weightInput.addEventListener('input', () => {
             weightValue.textContent = weightInput.value;
+        });
+        sizeInput.addEventListener('input', () => {
+            sizeValue.textContent = sizeInput.value;
         });
     </script>
 </body>

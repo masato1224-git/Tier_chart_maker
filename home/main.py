@@ -13,17 +13,27 @@ def load_font(size):
         return ImageFont.load_default()
 
 
+def normalize_color(color, default='#ffffff'):
+    if not color or not isinstance(color, str):
+        return default
+    color = color.strip()
+    if color.startswith('#') and len(color) in (4, 7):
+        return color
+    return default
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         # ステップ1: 設定を保存
         session['title'] = request.form.get('title', 'My Tier')
-        session['title_color'] = request.form.get('title_color', '#ffffff')
+        session['title_color'] = normalize_color(request.form.get('title_color', '#ffffff'))
         session['x_label'] = request.form.get('x_label', 'Width')
-        session['x_color'] = request.form.get('x_color', '#ffffff')
+        session['x_color'] = normalize_color(request.form.get('x_color', '#ffffff'))
         session['y_label'] = request.form.get('y_label', 'Height')
-        session['y_color'] = request.form.get('y_color', '#ffffff')
+        session['y_color'] = normalize_color(request.form.get('y_color', '#ffffff'))
         session['text_weight'] = int(request.form.get('text_weight', 0) or 0)
+        session['text_size'] = int(request.form.get('text_size', 40) or 40)
         
         # 背景画像を保存
         bg_file = request.files.get('bg_file')
@@ -38,7 +48,17 @@ def index():
         
         return redirect(url_for('place_images'))
     
-    return render_template('step1_settings.html')
+    return render_template(
+        'step1_settings.html',
+        title=session.get('title', 'My Best Games'),
+        title_color=session.get('title_color', '#ffffff'),
+        y_label=session.get('y_label', 'Quality'),
+        y_color=session.get('y_color', '#ff0000'),
+        x_label=session.get('x_label', 'Enjoyment'),
+        x_color=session.get('x_color', '#00ff00'),
+        text_weight=session.get('text_weight', 1),
+        text_size=session.get('text_size', 40),
+    )
 
 @app.route('/place_images', methods=['GET', 'POST'])
 def place_images():
@@ -85,8 +105,15 @@ def generate_final():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
     draw = ImageDraw.Draw(base_img)
-    title_font = load_font(40)
-    axis_font = load_font(24)
+    text_size = session.get('text_size', 40)
+    title_size = max(24, text_size)
+    axis_size = max(16, int(text_size * 0.6))
+    title_font = load_font(title_size)
+    axis_font = load_font(axis_size)
+    
+    title_color = normalize_color(title_color, '#ffffff')
+    x_color = normalize_color(x_color, '#ffffff')
+    y_color = normalize_color(y_color, '#ffffff')
     
     # タイトルと軸ラベルを描画
     draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=text_weight, stroke_fill=title_color)
@@ -134,8 +161,15 @@ def preview_image():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
     draw = ImageDraw.Draw(base_img)
-    title_font = load_font(40)
-    axis_font = load_font(24)
+    text_size = session.get('text_size', 40)
+    title_size = max(24, text_size)
+    axis_size = max(16, int(text_size * 0.6))
+    title_font = load_font(title_size)
+    axis_font = load_font(axis_size)
+    
+    title_color = normalize_color(title_color, '#ffffff')
+    x_color = normalize_color(x_color, '#ffffff')
+    y_color = normalize_color(y_color, '#ffffff')
     
     draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=text_weight, stroke_fill=title_color)
     draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=axis_font, stroke_width=text_weight, stroke_fill=y_color)
