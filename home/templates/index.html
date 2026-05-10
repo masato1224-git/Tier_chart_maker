@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang=""ja>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tier Chart Maker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Tier Chart Maker</h1>
+    <form action="/generate" method="post">
+        <label for="items">アイテムを入力してください（改行で区切る）:</label><br>
+        <textarea id="items" name="items" rows="10" cols="30"></textarea><br>
+        <input type="submit" value="生成">
+    </form> 
+</body>
+
+</html>
