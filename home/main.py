@@ -5,7 +5,14 @@ import io
 import base64
 
 
-def generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_color, bg_file=None):
+def load_font(size):
+    try:
+        return ImageFont.truetype("arial.ttf", size)
+    except OSError:
+        return ImageFont.load_default()
+
+
+def generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_color, text_weight=0, bg_file=None):
     # 背景の作成
     if bg_file and bg_file.filename != '':
         base_img = Image.open(bg_file).convert("RGBA").resize((1200, 800))
@@ -13,13 +20,36 @@ def generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
     draw = ImageDraw.Draw(base_img)
+    title_font = load_font(40)
+    axis_font = load_font(24)
     
     # 1. タイトルを描画 (右上)
-    draw.text((950, 30), title, fill=title_color)
+    draw.text(
+        (950, 30),
+        title,
+        fill=title_color,
+        font=title_font,
+        stroke_width=text_weight,
+        stroke_fill=title_color,
+    )
     
     # 2. 軸ラベルを描画
-    draw.text((50, 100), f"Y: {y_label}", fill=y_color) # 縦軸
-    draw.text((600, 750), f"X: {x_label}", fill=x_color) # 横軸
+    draw.text(
+        (50, 100),
+        f"Y: {y_label}",
+        fill=y_color,
+        font=axis_font,
+        stroke_width=text_weight,
+        stroke_fill=y_color,
+    )
+    draw.text(
+        (600, 750),
+        f"X: {x_label}",
+        fill=x_color,
+        font=axis_font,
+        stroke_width=text_weight,
+        stroke_fill=x_color,
+    )
     
     # 3. アップロードされた画像を配置
     x_offset, y_offset = 150, 150
@@ -45,12 +75,23 @@ def index():
         x_color = request.form.get('x_color', '#ffffff')
         y_label = request.form.get('y_label', 'Height')
         y_color = request.form.get('y_color', '#ffffff')
+        text_weight = int(request.form.get('text_weight', 0) or 0)
         
         bg_file = request.files.get('bg_file')
         files = request.files.getlist('images')
         
         # 画像生成
-        result_img = generate_tier_image(files, title, title_color, x_label, x_color, y_label, y_color, bg_file)
+        result_img = generate_tier_image(
+            files,
+            title,
+            title_color,
+            x_label,
+            x_color,
+            y_label,
+            y_color,
+            text_weight=text_weight,
+            bg_file=bg_file,
+        )
         
         # ブラウザ表示用にbase64エンコード
         buf = io.BytesIO()

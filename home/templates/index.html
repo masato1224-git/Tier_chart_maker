@@ -19,10 +19,16 @@
             <input type="color" name="title_color" value="#ffffff">
         </div>
         <div class="form-group">
+            <label>文字の太さ:</label>
+            <input type="range" name="text_weight" id="text_weight" min="0" max="10" value="1">
+            <span id="text_weight_value">1</span>
+        </div>
+        <div class="form-group">
             <label>縦軸ラベル:</label>
             <input type="text" name="y_label" value="Quality">
             <input type="color" name="y_color" value="#ff0000">
         </div>
+
         <div class="form-group">
             <label>横軸ラベル:</label>
             <input type="text" name="x_label" value="Enjoyment">
@@ -47,5 +53,12 @@
             <button>画像をダウンロード</button>
         </a>
     {% endif %}
+    <script>
+        const weightInput = document.getElementById('text_weight');
+        const weightValue = document.getElementById('text_weight_value');
+        weightInput.addEventListener('input', () => {
+            weightValue.textContent = weightInput.value;
+        });
+    </script>
 </body>
 </html>
