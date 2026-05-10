@@ -21,6 +21,12 @@
             <input type="text" name="title" value="{{ title }}" required>
             <label>色:</label>
             <input type="color" name="title_color" value="{{ title_color }}">
+            <label>太さ:</label>
+            <input type="range" name="title_weight" id="title_weight" min="0" max="10" value="{{ title_weight }}">
+            <span id="title_weight_value">{{ title_weight }}</span>
+            <label>サイズ:</label>
+            <input type="range" name="title_size" id="title_size" min="16" max="72" value="{{ title_size }}">
+            <span id="title_size_value">{{ title_size }}</span>px
         </div>
         <div class="form-group">
             <label>文字の太さ:</label>
@@ -37,6 +43,12 @@
             <input type="text" name="y_label" value="{{ y_label }}">
             <label>色:</label>
             <input type="color" name="y_color" value="{{ y_color }}">
+            <label>太さ:</label>
+            <input type="range" name="y_weight" id="y_weight" min="0" max="10" value="{{ y_weight }}">
+            <span id="y_weight_value">{{ y_weight }}</span>
+            <label>サイズ:</label>
+            <input type="range" name="y_size" id="y_size" min="16" max="72" value="{{ y_size }}">
+            <span id="y_size_value">{{ y_size }}</span>px
         </div>
 
         <div class="form-group">
@@ -44,6 +56,12 @@
             <input type="text" name="x_label" value="{{ x_label }}">
             <label>色:</label>
             <input type="color" name="x_color" value="{{ x_color }}">
+            <label>太さ:</label>
+            <input type="range" name="x_weight" id="x_weight" min="0" max="10" value="{{ x_weight }}">
+            <span id="x_weight_value">{{ x_weight }}</span>
+            <label>サイズ:</label>
+            <input type="range" name="x_size" id="x_size" min="16" max="72" value="{{ x_size }}">
+            <span id="x_size_value">{{ x_size }}</span>px
         </div>
         <div class="form-group">
             <label>背景画像:</label>
@@ -56,12 +74,42 @@
         const weightValue = document.getElementById('text_weight_value');
         const sizeInput = document.getElementById('text_size');
         const sizeValue = document.getElementById('text_size_value');
+        const titleWeightInput = document.getElementById('title_weight');
+        const titleWeightValue = document.getElementById('title_weight_value');
+        const titleSizeInput = document.getElementById('title_size');
+        const titleSizeValue = document.getElementById('title_size_value');
+        const yWeightInput = document.getElementById('y_weight');
+        const yWeightValue = document.getElementById('y_weight_value');
+        const ySizeInput = document.getElementById('y_size');
+        const ySizeValue = document.getElementById('y_size_value');
+        const xWeightInput = document.getElementById('x_weight');
+        const xWeightValue = document.getElementById('x_weight_value');
+        const xSizeInput = document.getElementById('x_size');
+        const xSizeValue = document.getElementById('x_size_value');
 
         weightInput.addEventListener('input', () => {
             weightValue.textContent = weightInput.value;
         });
         sizeInput.addEventListener('input', () => {
             sizeValue.textContent = sizeInput.value;
+        });
+        titleWeightInput.addEventListener('input', () => {
+            titleWeightValue.textContent = titleWeightInput.value;
+        });
+        titleSizeInput.addEventListener('input', () => {
+            titleSizeValue.textContent = titleSizeInput.value;
+        });
+        yWeightInput.addEventListener('input', () => {
+            yWeightValue.textContent = yWeightInput.value;
+        });
+        ySizeInput.addEventListener('input', () => {
+            ySizeValue.textContent = ySizeInput.value;
+        });
+        xWeightInput.addEventListener('input', () => {
+            xWeightValue.textContent = xWeightInput.value;
+        });
+        xSizeInput.addEventListener('input', () => {
+            xSizeValue.textContent = xSizeInput.value;
         });
     </script>
 </body>

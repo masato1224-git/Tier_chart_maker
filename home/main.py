@@ -1,4 +1,13 @@
-from home import app
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from werkzeug.utils import secure_filename
+from PIL import Image, ImageDraw, ImageFont
+import io
+import base64
+import os
+import uuid
+
+app = Flask(__name__)
+app.secret_key = 'tier_chart_maker_secret_2024'
 from flask import render_template, request, send_file, session, redirect, url_for
 from PIL import Image, ImageDraw, ImageFont
 from werkzeug.utils import secure_filename
@@ -63,10 +72,16 @@ def index():
         
         session['title'] = request.form.get('title', 'My Tier')
         session['title_color'] = normalize_color(request.form.get('title_color', '#ffffff'))
+        session['title_weight'] = int(request.form.get('title_weight', 0) or 0)
+        session['title_size'] = int(request.form.get('title_size', 40) or 40)
         session['x_label'] = request.form.get('x_label', 'Width')
         session['x_color'] = normalize_color(request.form.get('x_color', '#ffffff'))
+        session['x_weight'] = int(request.form.get('x_weight', 0) or 0)
+        session['x_size'] = int(request.form.get('x_size', 24) or 24)
         session['y_label'] = request.form.get('y_label', 'Height')
         session['y_color'] = normalize_color(request.form.get('y_color', '#ffffff'))
+        session['y_weight'] = int(request.form.get('y_weight', 0) or 0)
+        session['y_size'] = int(request.form.get('y_size', 24) or 24)
         session['text_weight'] = int(request.form.get('text_weight', 0) or 0)
         session['text_size'] = int(request.form.get('text_size', 40) or 40)
         
@@ -86,10 +101,16 @@ def index():
         'step1_settings.html',
         title=session.get('title', 'My Best Games'),
         title_color=session.get('title_color', '#ffffff'),
+        title_weight=session.get('title_weight', 0),
+        title_size=session.get('title_size', 40),
         y_label=session.get('y_label', 'Quality'),
         y_color=session.get('y_color', '#ff0000'),
+        y_weight=session.get('y_weight', 0),
+        y_size=session.get('y_size', 24),
         x_label=session.get('x_label', 'Enjoyment'),
         x_color=session.get('x_color', '#00ff00'),
+        x_weight=session.get('x_weight', 0),
+        x_size=session.get('x_size', 24),
         text_weight=session.get('text_weight', 1),
         text_size=session.get('text_size', 40),
     )
@@ -124,10 +145,16 @@ def generate_final():
     # 設定を取得
     title = session.get('title')
     title_color = session.get('title_color')
+    title_weight = session.get('title_weight', 0)
+    title_size = session.get('title_size', 40)
     x_label = session.get('x_label')
     x_color = session.get('x_color')
+    x_weight = session.get('x_weight', 0)
+    x_size = session.get('x_size', 24)
     y_label = session.get('y_label')
     y_color = session.get('y_color')
+    y_weight = session.get('y_weight', 0)
+    y_size = session.get('y_size', 24)
     text_weight = session.get('text_weight', 0)
     text_size = session.get('text_size', 40)
     bg_file_path = session.get('bg_file_path')
@@ -140,24 +167,36 @@ def generate_final():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
     draw = ImageDraw.Draw(base_img)
-    text_size = session.get('text_size', 40)
-    title_size = max(24, text_size)
-    axis_size = max(16, int(text_size * 0.6))
-    title_font = load_font(title_size)
-    axis_font = load_font(axis_size)
+    title_font = load_font(max(24, title_size))
+    y_axis_font = load_font(max(16, y_size))
+    x_axis_font = load_font(max(16, x_size))
     
     title_color = normalize_color(title_color, '#ffffff')
     x_color = normalize_color(x_color, '#ffffff')
     y_color = normalize_color(y_color, '#ffffff')
     
     # タイトルと軸ラベルを描画
-    draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=text_weight, stroke_fill=title_color)
-    draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=axis_font, stroke_width=text_weight, stroke_fill=y_color)
-    draw.text((600, 750), f"X: {x_label}", fill=x_color, font=axis_font, stroke_width=text_weight, stroke_fill=x_color)
+    draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
+    draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
+    draw.text((600, 750), f"X: {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
+    
+    # 軸の矢印を描画
+    # 縦軸 (Y軸)
+    draw.line([(100, 150), (100, 700)], fill=y_color, width=3)
+    draw.polygon([(95, 150), (105, 150), (100, 130)], fill=y_color)
+    
+    # 横軸 (X軸)
+    draw.line([(150, 650), (1100, 650)], fill=x_color, width=3)
+    draw.polygon([(1100, 645), (1100, 655), (1120, 650)], fill=x_color)
     
     # 画像を配置
     x_offset, y_offset = 150, 150
     for img_path in image_list:
+        if img_path is None:
+            # 改行
+            x_offset = 150
+            y_offset += 120
+            continue
         if not img_path or not os.path.exists(img_path):
             continue
         img = Image.open(img_path).convert("RGBA").resize((100, 100))
@@ -182,10 +221,16 @@ def preview_image():
     
     title = session.get('title')
     title_color = session.get('title_color')
+    title_weight = session.get('title_weight', 0)
+    title_size = session.get('title_size', 40)
     x_label = session.get('x_label')
     x_color = session.get('x_color')
+    x_weight = session.get('x_weight', 0)
+    x_size = session.get('x_size', 24)
     y_label = session.get('y_label')
     y_color = session.get('y_color')
+    y_weight = session.get('y_weight', 0)
+    y_size = session.get('y_size', 24)
     text_weight = session.get('text_weight', 0)
     text_size = session.get('text_size', 40)
     bg_file_path = session.get('bg_file_path')
@@ -197,22 +242,34 @@ def preview_image():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
     draw = ImageDraw.Draw(base_img)
-    text_size = session.get('text_size', 40)
-    title_size = max(24, text_size)
-    axis_size = max(16, int(text_size * 0.6))
-    title_font = load_font(title_size)
-    axis_font = load_font(axis_size)
+    title_font = load_font(max(24, title_size))
+    y_axis_font = load_font(max(16, y_size))
+    x_axis_font = load_font(max(16, x_size))
     
     title_color = normalize_color(title_color, '#ffffff')
     x_color = normalize_color(x_color, '#ffffff')
     y_color = normalize_color(y_color, '#ffffff')
     
-    draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=text_weight, stroke_fill=title_color)
-    draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=axis_font, stroke_width=text_weight, stroke_fill=y_color)
-    draw.text((600, 750), f"X: {x_label}", fill=x_color, font=axis_font, stroke_width=text_weight, stroke_fill=x_color)
+    draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
+    draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
+    draw.text((600, 750), f"X: {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
+    
+    # 軸の矢印を描画
+    # 縦軸 (Y軸)
+    draw.line([(100, 150), (100, 700)], fill=y_color, width=3)
+    draw.polygon([(95, 150), (105, 150), (100, 130)], fill=y_color)
+    
+    # 横軸 (X軸)
+    draw.line([(150, 650), (1100, 650)], fill=x_color, width=3)
+    draw.polygon([(1100, 645), (1100, 655), (1120, 650)], fill=x_color)
     
     x_offset, y_offset = 150, 150
     for img_path in image_list:
+        if img_path is None:
+            # 改行
+            x_offset = 150
+            y_offset += 120
+            continue
         if not img_path or not os.path.exists(img_path):
             continue
         img = Image.open(img_path).convert("RGBA").resize((100, 100))
@@ -232,11 +289,17 @@ def preview_image():
 def api_image_list():
     """セッションの画像リスト情報をJSON返す"""
     image_list = session.get('image_list', [])
-    return {'images': [f'image_{i}' for i in range(len(image_list))]}
+    images = []
+    for i, img_path in enumerate(image_list):
+        if img_path is None:
+            images.append(f'改行 {i + 1}')
+        else:
+            images.append(f'画像 {i + 1}')
+    return {'images': images}
 
 @app.route('/api/remove_image/<int:idx>', methods=['POST'])
 def api_remove_image(idx):
-    """セッションから指定インデックスの画像を削除"""
+    """セッションから指定インデックスの画像または改行を削除"""
     image_list = session.get('image_list', [])
     if 0 <= idx < len(image_list):
         image_list.pop(idx)
@@ -244,6 +307,15 @@ def api_remove_image(idx):
         session.modified = True
         return {'success': True}
     return {'success': False}
+
+@app.route('/api/add_newline', methods=['POST'])
+def api_add_newline():
+    """改行を追加"""
+    image_list = session.get('image_list', [])
+    image_list.append(None)  # Noneを追加して改行を表す
+    session['image_list'] = image_list
+    session.modified = True
+    return {'success': True}
 
 if __name__ == '__main__':
     app.run(debug=True)
