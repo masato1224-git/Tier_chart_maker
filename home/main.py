@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect,send_file, url_for, session, jsonify
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont
 import io
@@ -6,15 +6,9 @@ import base64
 import os
 import uuid
 
+#app = Flask(__name__, template_folder='home/templates', static_folder='home/static')
 app = Flask(__name__)
 app.secret_key = 'tier_chart_maker_secret_2024'
-from flask import render_template, request, send_file, session, redirect, url_for
-from PIL import Image, ImageDraw, ImageFont
-from werkzeug.utils import secure_filename
-import io
-import os
-import uuid
-import base64
 import json
 
 UPLOAD_DIR = os.path.join(os.getcwd(), 'tmp_uploads')
@@ -66,6 +60,7 @@ def save_uploaded_file(file_storage, prefix):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    print("Index function called")  # デバッグ用
     if request.method == 'POST':
         # 過去のアップロードを削除してから新規設定を保存
         cleanup_temp_files()
@@ -318,5 +313,13 @@ def api_add_newline():
     return {'success': True}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("Starting Flask app...")  # デバッグ用
+    print(f"App: {app}")  # デバッグ用
+    print(f"URL Map: {app.url_map}")  # デバッグ用
+    print(f"Template folder: {app.template_folder}")  # デバッグ用
+    print(f"Current directory: {os.getcwd()}")  # デバッグ用
+    try:
+        app.run(debug=True)
+    except Exception as e:
+        print(f"Error starting Flask app: {e}")  # デバッグ用
 
