@@ -1,9 +1,15 @@
 from home import app
 from flask import render_template, request, send_file, session, redirect, url_for
 from PIL import Image, ImageDraw, ImageFont
+from werkzeug.utils import secure_filename
 import io
+import os
+import uuid
 import base64
 import json
+
+UPLOAD_DIR = os.path.join(os.getcwd(), 'tmp_uploads')
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 def load_font(size):
@@ -22,10 +28,39 @@ def normalize_color(color, default='#ffffff'):
     return default
 
 
+def cleanup_temp_files():
+    bg_path = session.pop('bg_file_path', None)
+    image_paths = session.pop('image_list', None)
+    if bg_path and os.path.exists(bg_path):
+        try:
+            os.remove(bg_path)
+        except OSError:
+            pass
+    if image_paths:
+        for p in image_paths:
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
+
+
+def save_uploaded_file(file_storage, prefix):
+    filename = secure_filename(file_storage.filename)
+    if not filename:
+        return None
+    unique_name = f"{prefix}_{uuid.uuid4().hex}_{filename}"
+    path = os.path.join(UPLOAD_DIR, unique_name)
+    file_storage.save(path)
+    return path
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # ステップ1: 設定を保存
+        # 過去のアップロードを削除してから新規設定を保存
+        cleanup_temp_files()
+        
         session['title'] = request.form.get('title', 'My Tier')
         session['title_color'] = normalize_color(request.form.get('title_color', '#ffffff'))
         session['x_label'] = request.form.get('x_label', 'Width')
@@ -38,10 +73,9 @@ def index():
         # 背景画像を保存
         bg_file = request.files.get('bg_file')
         if bg_file and bg_file.filename != '':
-            bg_data = base64.b64encode(bg_file.read()).decode('utf-8')
-            session['bg_file_data'] = bg_data
+            session['bg_file_path'] = save_uploaded_file(bg_file, 'bg')
         else:
-            session['bg_file_data'] = None
+            session['bg_file_path'] = None
         
         # 初期化: 画像リスト
         session['image_list'] = []
@@ -70,9 +104,10 @@ def place_images():
         # 画像が追加されたか確認
         new_image = request.files.get('image')
         if new_image and new_image.filename != '':
-            img_data = base64.b64encode(new_image.read()).decode('utf-8')
-            session['image_list'].append(img_data)
-            session.modified = True
+            image_path = save_uploaded_file(new_image, 'item')
+            if image_path:
+                session['image_list'].append(image_path)
+                session.modified = True
         
         # 最終画像生成
         if 'generate' in request.form:
@@ -94,13 +129,13 @@ def generate_final():
     y_label = session.get('y_label')
     y_color = session.get('y_color')
     text_weight = session.get('text_weight', 0)
-    bg_file_data = session.get('bg_file_data')
+    text_size = session.get('text_size', 40)
+    bg_file_path = session.get('bg_file_path')
     image_list = session.get('image_list', [])
     
     # 背景画像をセット
-    if bg_file_data:
-        bg_file_bytes = io.BytesIO(base64.b64decode(bg_file_data))
-        base_img = Image.open(bg_file_bytes).convert("RGBA").resize((1200, 800))
+    if bg_file_path and os.path.exists(bg_file_path):
+        base_img = Image.open(bg_file_path).convert("RGBA").resize((1200, 800))
     else:
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
@@ -122,9 +157,10 @@ def generate_final():
     
     # 画像を配置
     x_offset, y_offset = 150, 150
-    for img_data in image_list:
-        img_bytes = io.BytesIO(base64.b64decode(img_data))
-        img = Image.open(img_bytes).convert("RGBA").resize((100, 100))
+    for img_path in image_list:
+        if not img_path or not os.path.exists(img_path):
+            continue
+        img = Image.open(img_path).convert("RGBA").resize((100, 100))
         base_img.paste(img, (x_offset, y_offset), img)
         x_offset += 120
         if x_offset > 1000:
@@ -151,12 +187,12 @@ def preview_image():
     y_label = session.get('y_label')
     y_color = session.get('y_color')
     text_weight = session.get('text_weight', 0)
-    bg_file_data = session.get('bg_file_data')
+    text_size = session.get('text_size', 40)
+    bg_file_path = session.get('bg_file_path')
     image_list = session.get('image_list', [])
     
-    if bg_file_data:
-        bg_file_bytes = io.BytesIO(base64.b64decode(bg_file_data))
-        base_img = Image.open(bg_file_bytes).convert("RGBA").resize((1200, 800))
+    if bg_file_path and os.path.exists(bg_file_path):
+        base_img = Image.open(bg_file_path).convert("RGBA").resize((1200, 800))
     else:
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
     
@@ -176,9 +212,10 @@ def preview_image():
     draw.text((600, 750), f"X: {x_label}", fill=x_color, font=axis_font, stroke_width=text_weight, stroke_fill=x_color)
     
     x_offset, y_offset = 150, 150
-    for img_data in image_list:
-        img_bytes = io.BytesIO(base64.b64decode(img_data))
-        img = Image.open(img_bytes).convert("RGBA").resize((100, 100))
+    for img_path in image_list:
+        if not img_path or not os.path.exists(img_path):
+            continue
+        img = Image.open(img_path).convert("RGBA").resize((100, 100))
         base_img.paste(img, (x_offset, y_offset), img)
         x_offset += 120
         if x_offset > 1000:
