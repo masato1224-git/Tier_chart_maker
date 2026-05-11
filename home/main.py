@@ -5,10 +5,12 @@ import io
 import base64
 import os
 import uuid
+from home import app
+
 
 #app = Flask(__name__, template_folder='home/templates', static_folder='home/static')
-app = Flask(__name__)
-app.secret_key = 'tier_chart_maker_secret_2024'
+#app = Flask(__name__)
+#app.secret_key = 'tier_chart_maker_secret_2024'
 
 UPLOAD_DIR = os.path.join(os.getcwd(), 'tmp_uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
