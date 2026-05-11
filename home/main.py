@@ -7,14 +7,8 @@ import os
 import uuid
 from home import app
 
-
-#app = Flask(__name__, template_folder='home/templates', static_folder='home/static')
-#app = Flask(__name__)
-#app.secret_key = 'tier_chart_maker_secret_2024'
-
 UPLOAD_DIR = os.path.join(os.getcwd(), 'tmp_uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-
 
 def load_font(size):
     try:
@@ -211,7 +205,7 @@ def generate_final():
 
 @app.route('/preview_image')
 def preview_image():
-    """プレビュー画像を返す"""
+    #プレビュー画像を返す
     if 'title' not in session:
         return redirect(url_for('index'))
     
@@ -295,7 +289,7 @@ def api_image_list():
 
 @app.route('/api/remove_image/<int:idx>', methods=['POST'])
 def api_remove_image(idx):
-    """セッションから指定インデックスの画像または改行を削除"""
+    #セッションから指定インデックスの画像または改行を削除
     image_list = session.get('image_list', [])
     if 0 <= idx < len(image_list):
         image_list.pop(idx)
@@ -306,7 +300,7 @@ def api_remove_image(idx):
 
 @app.route('/api/add_newline', methods=['POST'])
 def api_add_newline():
-    """改行を追加"""
+    #改行を追加
     image_list = session.get('image_list', [])
     image_list.append(None)  # Noneを追加して改行を表す
     session['image_list'] = image_list
