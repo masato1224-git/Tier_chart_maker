@@ -62,29 +62,25 @@
         <button type="submit">次へ進む → 画像配置ページ</button>
     </form>
     <script>
-        const weightInput = document.getElementById('text_weight');
-        const weightValue = document.getElementById('text_weight_value');
-        const sizeInput = document.getElementById('text_size');
-        const sizeValue = document.getElementById('text_size_value');
+        // タイトル設定の値表示更新
         const titleWeightInput = document.getElementById('title_weight');
         const titleWeightValue = document.getElementById('title_weight_value');
         const titleSizeInput = document.getElementById('title_size');
         const titleSizeValue = document.getElementById('title_size_value');
+        
+        // 縦軸設定の値表示更新
         const yWeightInput = document.getElementById('y_weight');
         const yWeightValue = document.getElementById('y_weight_value');
         const ySizeInput = document.getElementById('y_size');
         const ySizeValue = document.getElementById('y_size_value');
+        
+        // 横軸設定の値表示更新
         const xWeightInput = document.getElementById('x_weight');
         const xWeightValue = document.getElementById('x_weight_value');
         const xSizeInput = document.getElementById('x_size');
         const xSizeValue = document.getElementById('x_size_value');
 
-        weightInput.addEventListener('input', () => {
-            weightValue.textContent = weightInput.value;
-        });
-        sizeInput.addEventListener('input', () => {
-            sizeValue.textContent = sizeInput.value;
-        });
+        // イベントリスナーの設定
         titleWeightInput.addEventListener('input', () => {
             titleWeightValue.textContent = titleWeightInput.value;
         });

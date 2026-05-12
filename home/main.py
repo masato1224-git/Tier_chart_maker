@@ -90,7 +90,7 @@ def index():
     return render_template(
         'step1_settings.html',
         title=session.get('title', 'My Best Games'),
-        title_color=session.get('title_color', '#ffffff'),
+        title_color=session.get('title_color', "#ffffff"),
         title_weight=session.get('title_weight', 0),
         title_size=session.get('title_size', 40),
         y_label=session.get('y_label', 'Quality'),
