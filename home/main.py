@@ -167,17 +167,17 @@ def generate_final():
     
     # タイトルと軸ラベルを描画
     draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((50, 100), f"Y: {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
-    draw.text((600, 750), f"X: {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
+    draw.text((50, 60), f" {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
+    draw.text((500, 750), f" {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
     
     # 軸の矢印を描画
     # 縦軸 (Y軸)
-    draw.line([(100, 150), (100, 700)], fill=y_color, width=3)
-    draw.polygon([(95, 150), (105, 150), (100, 130)], fill=y_color)
+    draw.line([(100, 150), (100, 700)], fill=y_color, width=5)
+    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_color)
     
     # 横軸 (X軸)
-    draw.line([(150, 650), (1100, 650)], fill=x_color, width=3)
-    draw.polygon([(1100, 645), (1100, 655), (1120, 650)], fill=x_color)
+    draw.line([(100, 700), (1100, 700)], fill=x_color, width=5)
+    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_color)
     
     # 画像を配置
     x_offset, y_offset = 150, 150
