@@ -5,9 +5,10 @@ import io
 import base64
 import os
 import uuid
+import logging
 from home import app
 
-UPLOAD_DIR = os.path.join(os.getcwd(), 'tmp_uploads')
+UPLOAD_DIR = os.path.join(os.getcwd(), os.environ.get('UPLOAD_DIR', 'tmp_uploads'))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def load_font(size):
@@ -47,6 +48,23 @@ def save_uploaded_file(file_storage, prefix):
     filename = secure_filename(file_storage.filename)
     if not filename:
         return None
+    
+    # ファイルタイプの検証（画像のみ許可）
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
+    if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        return None
+    
+    # MIMEタイプの検証
+    if not file_storage.mimetype.startswith('image/'):
+        return None
+    
+    # ファイルサイズの制限（例: 5MB）
+    file_storage.seek(0, os.SEEK_END)
+    file_size = file_storage.tell()
+    file_storage.seek(0)
+    if file_size > 5 * 1024 * 1024:  # 5MB
+        return None
+    
     unique_name = f"{prefix}_{uuid.uuid4().hex}_{filename}"
     path = os.path.join(UPLOAD_DIR, unique_name)
     file_storage.save(path)
@@ -55,7 +73,7 @@ def save_uploaded_file(file_storage, prefix):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    print("Index function called")  # デバッグ用
+    app.logger.info("Index function called")  # デバッグ用
     if request.method == 'POST':
         # 過去のアップロードを削除してから新規設定を保存
         cleanup_temp_files()
@@ -311,15 +329,4 @@ def api_add_newline():
     session['image_list'] = image_list
     session.modified = True
     return {'success': True}
-
-if __name__ == '__main__':
-    print("Starting Flask app...")  # デバッグ用
-    print(f"App: {app}")  # デバッグ用
-    print(f"URL Map: {app.url_map}")  # デバッグ用
-    print(f"Template folder: {app.template_folder}")  # デバッグ用
-    print(f"Current directory: {os.getcwd()}")  # デバッグ用
-    try:
-        app.run(debug=True)
-    except Exception as e:
-        print(f"Error starting Flask app: {e}")  # デバッグ用
 
