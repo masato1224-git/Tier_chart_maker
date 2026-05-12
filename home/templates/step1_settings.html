@@ -4,61 +4,193 @@
     <meta charset="UTF-8">
     <title>Flask Tier Maker - 設定</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
-        .form-group { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        label { display: inline-block; width: 120px; font-weight: bold; }
-        input[type="text"], input[type="color"], input[type="file"], input[type="range"] { padding: 5px; }
-        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #45a049; }
-        h1 { color: #333; }
+        body { 
+            font-family: sans-serif; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f0f2f5; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .form-group h3 { 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            color: #333; 
+            border-bottom: 2px solid #4CAF50; 
+            padding-bottom: 5px; 
+        }
+        .setting-row { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            flex-wrap: wrap; 
+        }
+        .setting-row:last-child { 
+            margin-bottom: 0; 
+        }
+        .setting-label { 
+            min-width: 80px; 
+            font-weight: bold; 
+            color: #555; 
+            margin-right: 15px; 
+        }
+        .setting-input { 
+            flex: 1; 
+            min-width: 150px; 
+        }
+        .range-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .range-container input[type="range"] { 
+            flex: 1; 
+        }
+        .value-display { 
+            min-width: 30px; 
+            text-align: center; 
+            font-weight: bold; 
+            color: #4CAF50; 
+        }
+        input[type="text"], input[type="color"], input[type="file"] { 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        input[type="range"] { 
+            padding: 5px 0; 
+        }
+        button { 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            display: block; 
+            margin: 20px auto 0; 
+            transition: background 0.3s; 
+        }
+        button:hover { 
+            background: #45a049; 
+        }
+        h1 { 
+            color: #333; 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
     </style>
 </head>
 <body>
     <h1>Tier表メーカー - ステップ1: 設定</h1>
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
-            <label>タイトル:</label>
-            <input type="text" name="title" value="{{ title }}" required>
-            <label>色:</label>
-            <input type="color" name="title_color" value="{{ title_color }}">
-            <label>太さ:</label>
-            <input type="range" name="title_weight" id="title_weight" min="0" max="10" value="{{ title_weight }}">
-            <span id="title_weight_value">{{ title_weight }}</span>
-            <label>サイズ:</label>
-            <input type="range" name="title_size" id="title_size" min="16" max="72" value="{{ title_size }}">
-            <span id="title_size_value">{{ title_size }}</span>px
+            <h3>タイトル設定</h3>
+            <div class="setting-row">
+                <span class="setting-label">テキスト:</span>
+                <div class="setting-input">
+                    <input type="text" name="title" value="{{ title }}" required>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">タイトルの色:</span>
+                <div class="setting-input">
+                    <input type="color" name="title_color" value="{{ title_color }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">太さ:</span>
+                <div class="range-container">
+                    <input type="range" name="title_weight" id="title_weight" min="0" max="10" value="{{ title_weight }}">
+                    <span class="value-display" id="title_weight_value">{{ title_weight }}</span>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">サイズ:</span>
+                <div class="range-container">
+                    <input type="range" name="title_size" id="title_size" min="16" max="72" value="{{ title_size }}">
+                    <span class="value-display" id="title_size_value">{{ title_size }}</span>px
+                </div>
+            </div>
         </div>
         
-        
         <div class="form-group">
-            <label>縦軸ラベル:</label>
-            <input type="text" name="y_label" value="{{ y_label }}">
-            <label>色:</label>
-            <input type="color" name="y_color" value="{{ y_color }}">
-            <label>太さ:</label>
-            <input type="range" name="y_weight" id="y_weight" min="0" max="10" value="{{ y_weight }}">
-            <span id="y_weight_value">{{ y_weight }}</span>
-            <label>サイズ:</label>
-            <input type="range" name="y_size" id="y_size" min="16" max="72" value="{{ y_size }}">
-            <span id="y_size_value">{{ y_size }}</span>px
+            <h3>縦軸設定</h3>
+            <div class="setting-row">
+                <span class="setting-label">ラベル:</span>
+                <div class="setting-input">
+                    <input type="text" name="y_label" value="{{ y_label }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">縦軸の色:</span>
+                <div class="setting-input">
+                    <input type="color" name="y_color" value="{{ y_color }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">太さ:</span>
+                <div class="range-container">
+                    <input type="range" name="y_weight" id="y_weight" min="0" max="10" value="{{ y_weight }}">
+                    <span class="value-display" id="y_weight_value">{{ y_weight }}</span>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">サイズ:</span>
+                <div class="range-container">
+                    <input type="range" name="y_size" id="y_size" min="16" max="72" value="{{ y_size }}">
+                    <span class="value-display" id="y_size_value">{{ y_size }}</span>px
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
-            <label>横軸ラベル:</label>
-            <input type="text" name="x_label" value="{{ x_label }}">
-            <label>色:</label>
-            <input type="color" name="x_color" value="{{ x_color }}">
-            <label>太さ:</label>
-            <input type="range" name="x_weight" id="x_weight" min="0" max="10" value="{{ x_weight }}">
-            <span id="x_weight_value">{{ x_weight }}</span>
-            <label>サイズ:</label>
-            <input type="range" name="x_size" id="x_size" min="16" max="72" value="{{ x_size }}">
-            <span id="x_size_value">{{ x_size }}</span>px
+            <h3>横軸設定</h3>
+            <div class="setting-row">
+                <span class="setting-label">ラベル:</span>
+                <div class="setting-input">
+                    <input type="text" name="x_label" value="{{ x_label }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">横軸の色:</span>
+                <div class="setting-input">
+                    <input type="color" name="x_color" value="{{ x_color }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">太さ:</span>
+                <div class="range-container">
+                    <input type="range" name="x_weight" id="x_weight" min="0" max="10" value="{{ x_weight }}">
+                    <span class="value-display" id="x_weight_value">{{ x_weight }}</span>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">サイズ:</span>
+                <div class="range-container">
+                    <input type="range" name="x_size" id="x_size" min="16" max="72" value="{{ x_size }}">
+                    <span class="value-display" id="x_size_value">{{ x_size }}</span>px
+                </div>
+            </div>
         </div>
+        
         <div class="form-group">
-            <label>背景画像:</label>
-            <input type="file" name="bg_file" accept="image/*">
+            <h3>背景設定</h3>
+            <div class="setting-row">
+                <span class="setting-label">画像:</span>
+                <div class="setting-input">
+                    <input type="file" name="bg_file" accept="image/*">
+                </div>
+            </div>
         </div>
+        
         <button type="submit">次へ進む → 画像配置ページ</button>
     </form>
     <script>
