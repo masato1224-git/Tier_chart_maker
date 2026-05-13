@@ -83,11 +83,15 @@ def index():
         session['title_weight'] = int(request.form.get('title_weight', 0) or 0)
         session['title_size'] = int(request.form.get('title_size', 40) or 40)
         session['x_label'] = request.form.get('x_label', 'Width')
-        session['x_color'] = normalize_color(request.form.get('x_color', '#ffffff'))
+        session['x_label_color'] = normalize_color(request.form.get('x_label_color', '#ffffff'))
+        session['x_arrow_color'] = normalize_color(request.form.get('x_arrow_color', request.form.get('x_label_color', '#ffffff')))
+        session['x_color'] = session['x_label_color']
         session['x_weight'] = int(request.form.get('x_weight', 0) or 0)
         session['x_size'] = int(request.form.get('x_size', 24) or 24)
         session['y_label'] = request.form.get('y_label', 'Height')
-        session['y_color'] = normalize_color(request.form.get('y_color', '#ffffff'))
+        session['y_label_color'] = normalize_color(request.form.get('y_label_color', '#ffffff'))
+        session['y_arrow_color'] = normalize_color(request.form.get('y_arrow_color', request.form.get('y_label_color', '#ffffff')))
+        session['y_color'] = session['y_label_color']
         session['y_weight'] = int(request.form.get('y_weight', 0) or 0)
         session['y_size'] = int(request.form.get('y_size', 24) or 24)
         session['text_weight'] = int(request.form.get('text_weight', 0) or 0)
@@ -112,11 +116,13 @@ def index():
         title_weight=session.get('title_weight', 0),
         title_size=session.get('title_size', 40),
         y_label=session.get('y_label', 'Quality'),
-        y_color=session.get('y_color', '#ff0000'),
+        y_label_color=session.get('y_label_color', session.get('y_color', '#ff0000')),
+        y_arrow_color=session.get('y_arrow_color', session.get('y_color', '#ff0000')),
         y_weight=session.get('y_weight', 0),
         y_size=session.get('y_size', 24),
         x_label=session.get('x_label', 'Enjoyment'),
-        x_color=session.get('x_color', '#00ff00'),
+        x_label_color=session.get('x_label_color', session.get('x_color', '#00ff00')),
+        x_arrow_color=session.get('x_arrow_color', session.get('x_color', '#00ff00')),
         x_weight=session.get('x_weight', 0),
         x_size=session.get('x_size', 24),
         text_weight=session.get('text_weight', 1),
@@ -156,11 +162,13 @@ def generate_final():
     title_weight = session.get('title_weight', 0)
     title_size = session.get('title_size', 40)
     x_label = session.get('x_label')
-    x_color = session.get('x_color')
+    x_label_color = session.get('x_label_color', session.get('x_color'))
+    x_arrow_color = session.get('x_arrow_color', session.get('x_color', x_label_color))
     x_weight = session.get('x_weight', 0)
     x_size = session.get('x_size', 24)
     y_label = session.get('y_label')
-    y_color = session.get('y_color')
+    y_label_color = session.get('y_label_color', session.get('y_color'))
+    y_arrow_color = session.get('y_arrow_color', session.get('y_color', y_label_color))
     y_weight = session.get('y_weight', 0)
     y_size = session.get('y_size', 24)
     text_weight = session.get('text_weight', 0)
@@ -180,22 +188,24 @@ def generate_final():
     x_axis_font = load_font(max(16, x_size))
     
     title_color = normalize_color(title_color, '#ffffff')
-    x_color = normalize_color(x_color, '#ffffff')
-    y_color = normalize_color(y_color, '#ffffff')
+    x_label_color = normalize_color(x_label_color, '#ffffff')
+    x_arrow_color = normalize_color(x_arrow_color, x_label_color)
+    y_label_color = normalize_color(y_label_color, '#ffffff')
+    y_arrow_color = normalize_color(y_arrow_color, y_label_color)
     
     # タイトルと軸ラベルを描画
     draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((50, 60), f" {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
-    draw.text((500, 750), f" {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
+    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    draw.text((500, 750), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
     
     # 軸の矢印を描画
     # 縦軸 (Y軸)
-    draw.line([(100, 150), (100, 700)], fill=y_color, width=5)
-    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_color)
+    draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
+    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
     
     # 横軸 (X軸)
-    draw.line([(100, 700), (1100, 700)], fill=x_color, width=5)
-    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_color)
+    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
+    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
     
     # 画像を配置
     x_offset, y_offset = 150, 150
@@ -232,11 +242,13 @@ def preview_image():
     title_weight = session.get('title_weight', 0)
     title_size = session.get('title_size', 40)
     x_label = session.get('x_label')
-    x_color = session.get('x_color')
+    x_label_color = session.get('x_label_color', session.get('x_color'))
+    x_arrow_color = session.get('x_arrow_color', session.get('x_color', x_label_color))
     x_weight = session.get('x_weight', 0)
     x_size = session.get('x_size', 24)
     y_label = session.get('y_label')
-    y_color = session.get('y_color')
+    y_label_color = session.get('y_label_color', session.get('y_color'))
+    y_arrow_color = session.get('y_arrow_color', session.get('y_color', y_label_color))
     y_weight = session.get('y_weight', 0)
     y_size = session.get('y_size', 24)
     text_weight = session.get('text_weight', 0)
@@ -255,8 +267,10 @@ def preview_image():
     x_axis_font = load_font(max(16, x_size))
     
     title_color = normalize_color(title_color, '#ffffff')
-    x_color = normalize_color(x_color, '#ffffff')
-    y_color = normalize_color(y_color, '#ffffff')
+    x_label_color = normalize_color(x_label_color, '#ffffff')
+    x_arrow_color = normalize_color(x_arrow_color, x_label_color)
+    y_label_color = normalize_color(y_label_color, '#ffffff')
+    y_arrow_color = normalize_color(y_arrow_color, y_label_color)
     
     # タイトルの配置を右端に合わせる
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
@@ -264,17 +278,17 @@ def preview_image():
     title_x = 1200 - title_width - 20  # 右端から20px余白
     draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
     
-    draw.text((50, 60), f" {y_label}", fill=y_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_color)
-    draw.text((500, 750), f" {x_label}", fill=x_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_color)
+    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    draw.text((500, 750), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
     
     # 軸の矢印を描画
     # 縦軸 (Y軸)
-    draw.line([(100, 120), (100, 700)], fill=y_color, width=5)
-    draw.polygon([(90, 120), (110, 120), (100, 100)], fill=y_color)
+    draw.line([(100, 120), (100, 700)], fill=y_arrow_color, width=5)
+    draw.polygon([(90, 120), (110, 120), (100, 100)], fill=y_arrow_color)
     
     # 横軸 (X軸)
-    draw.line([(100, 700), (1100, 700)], fill=x_color, width=5)
-    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_color)
+    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
+    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
     
     x_offset, y_offset = 150, 150
     for img_path in image_list:

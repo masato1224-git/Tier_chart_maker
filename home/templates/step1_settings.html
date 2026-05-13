@@ -94,7 +94,7 @@
         <div class="form-group">
             <h3>タイトル設定</h3>
             <div class="setting-row">
-                <span class="setting-label">テキスト:</span>
+                <span class="setting-label">タイトル:</span>
                 <div class="setting-input">
                     <input type="text" name="title" value="{{ title }}" required>
                 </div>
@@ -106,14 +106,14 @@
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">太さ:</span>
+                <span class="setting-label">文字の太さ:</span>
                 <div class="range-container">
                     <input type="range" name="title_weight" id="title_weight" min="0" max="10" value="{{ title_weight }}">
                     <span class="value-display" id="title_weight_value">{{ title_weight }}</span>
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">サイズ:</span>
+                <span class="setting-label">文字のサイズ:</span>
                 <div class="range-container">
                     <input type="range" name="title_size" id="title_size" min="16" max="72" value="{{ title_size }}">
                     <span class="value-display" id="title_size_value">{{ title_size }}</span>px
@@ -130,20 +130,26 @@
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">縦軸の色:</span>
+                <span class="setting-label">ラベルの色:</span>
                 <div class="setting-input">
-                    <input type="color" name="y_color" value="{{ y_color }}">
+                    <input type="color" name="y_label_color" value="{{ y_label_color }}">
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">太さ:</span>
+                <span class="setting-label">矢印の色:</span>
+                <div class="setting-input">
+                    <input type="color" name="y_arrow_color" value="{{ y_arrow_color }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">文字の太さ:</span>
                 <div class="range-container">
                     <input type="range" name="y_weight" id="y_weight" min="0" max="10" value="{{ y_weight }}">
                     <span class="value-display" id="y_weight_value">{{ y_weight }}</span>
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">サイズ:</span>
+                <span class="setting-label">文字のサイズ:</span>
                 <div class="range-container">
                     <input type="range" name="y_size" id="y_size" min="16" max="72" value="{{ y_size }}">
                     <span class="value-display" id="y_size_value">{{ y_size }}</span>px
@@ -160,20 +166,26 @@
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">横軸の色:</span>
+                <span class="setting-label">ラベルの色:</span>
                 <div class="setting-input">
-                    <input type="color" name="x_color" value="{{ x_color }}">
+                    <input type="color" name="x_label_color" value="{{ x_label_color }}">
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">太さ:</span>
+                <span class="setting-label">矢印の色:</span>
+                <div class="setting-input">
+                    <input type="color" name="x_arrow_color" value="{{ x_arrow_color }}">
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">文字の太さ:</span>
                 <div class="range-container">
                     <input type="range" name="x_weight" id="x_weight" min="0" max="10" value="{{ x_weight }}">
                     <span class="value-display" id="x_weight_value">{{ x_weight }}</span>
                 </div>
             </div>
             <div class="setting-row">
-                <span class="setting-label">サイズ:</span>
+                <span class="setting-label">文字のサイズ:</span>
                 <div class="range-container">
                     <input type="range" name="x_size" id="x_size" min="16" max="72" value="{{ x_size }}">
                     <span class="value-display" id="x_size_value">{{ x_size }}</span>px
