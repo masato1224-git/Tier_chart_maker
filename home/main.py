@@ -10,11 +10,9 @@ UPLOAD_DIR = os.path.join(os.getcwd(), os.environ.get('UPLOAD_DIR', 'tmp_uploads
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 FONT_FAMILY_MAP = {
-    'Arial': ['arial.ttf', 'Arial.ttf', 'LiberationSans-Regular.ttf', 'DejaVuSans.ttf'],
     'Times New Roman': ['times.ttf', 'Times New Roman.ttf', 'LiberationSerif-Regular.ttf', 'DejaVuSerif.ttf'],
     'Courier New': ['cour.ttf', 'Courier New.ttf', 'LiberationMono-Regular.ttf', 'DejaVuSansMono.ttf'],
-    'DejaVu Sans': ['DejaVuSans.ttf', 'LiberationSans-Regular.ttf', 'arial.ttf', 'Arial.ttf'],
-    'Default': ['arial.ttf', 'Arial.ttf', 'LiberationSans-Regular.ttf', 'DejaVuSans.ttf'],
+    'Default': ['meiryo.ttc', 'yugothic.ttf', 'NotoSansCJKjp-Regular.otf', 'NotoSansJP-Regular.otf', 'arial.ttf', 'Arial.ttf', 'LiberationSans-Regular.ttf', 'DejaVuSans.ttf'],
 }
 
 FONT_DIRS = [
@@ -147,9 +145,9 @@ def build_preview_image():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
 
     draw = ImageDraw.Draw(base_img)
-    title_font_family = session.get('title_font_family', 'Arial')
-    y_axis_font_family = session.get('y_font_family', 'Arial')
-    x_axis_font_family = session.get('x_font_family', 'Arial')
+    title_font_family = session.get('title_font_family', 'Default')
+    y_axis_font_family = session.get('y_font_family', 'Default')
+    x_axis_font_family = session.get('x_font_family', 'Default')
     title_font = load_font(title_font_family, max(24, title_size))
     y_axis_font = load_font(y_axis_font_family, max(16, y_size))
     x_axis_font = load_font(x_axis_font_family, max(16, x_size))
@@ -231,7 +229,7 @@ def index():
         session['title_color'] = normalize_color(request.form.get('title_color', '#ffffff'))
         session['title_weight'] = int(request.form.get('title_weight', 0) or 0)
         session['title_size'] = int(request.form.get('title_size', 40) or 40)
-        session['title_font_family'] = request.form.get('title_font_family', 'Arial')
+        session['title_font_family'] = request.form.get('title_font_family', 'Default')
         session['x_label'] = request.form.get('x_label', 'Width')
         session['x_label_color'] = normalize_color(request.form.get('x_label_color', '#ffffff'))
         session['x_arrow_color'] = normalize_color(request.form.get('x_arrow_color', request.form.get('x_label_color', '#ffffff')))
@@ -242,8 +240,8 @@ def index():
         session['y_label_color'] = normalize_color(request.form.get('y_label_color', '#ffffff'))
         session['y_arrow_color'] = normalize_color(request.form.get('y_arrow_color', request.form.get('y_label_color', '#ffffff')))
         session['y_color'] = session['y_label_color']
-        session['y_font_family'] = request.form.get('y_font_family', 'Arial')
-        session['x_font_family'] = request.form.get('x_font_family', 'Arial')
+        session['y_font_family'] = request.form.get('y_font_family', 'Default')
+        session['x_font_family'] = request.form.get('x_font_family', 'Default')
         session['y_weight'] = int(request.form.get('y_weight', 0) or 0)
         session['y_size'] = int(request.form.get('y_size', 24) or 24)
         session['text_weight'] = int(request.form.get('text_weight', 0) or 0)
@@ -279,9 +277,9 @@ def index():
         x_size = session.get('x_size', 24),
         text_weight = session.get('text_weight', 1),
         text_size = session.get('text_size', 40),
-        title_font_family = session.get('title_font_family', 'Arial'),
-        y_font_family = session.get('y_font_family', 'Arial'),
-        x_font_family = session.get('x_font_family', 'Arial'),
+        title_font_family = session.get('title_font_family', 'Default'),
+        y_font_family = session.get('y_font_family', 'Default'),
+        x_font_family = session.get('x_font_family', 'Default'),
     )
 
 @app.route('/place_images', methods=['GET', 'POST'])
