@@ -115,20 +115,47 @@ def build_preview_image():
     draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
     draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
 
+    max_cols = 8
+    row_gap = 20
+    max_bottom = 700 - 20
+    available_height = max_bottom - 150
+    rows = 0
+    current_col = 0
+    for img_path in image_list:
+        if img_path is None:
+            if current_col != 0 or rows == 0:
+                rows += 1
+            current_col = 0
+            continue
+        current_col += 1
+        if current_col > max_cols:
+            rows += 1
+            current_col = 1
+    if current_col > 0:
+        rows += 1
+
+    image_size = 100
+    if rows > 0:
+        image_size = min(100, max(20, (available_height - (rows - 1) * row_gap) // rows))
+        if image_size < 40:
+            row_gap = 10
+            image_size = max(20, min(100, (available_height - (rows - 1) * row_gap) // rows))
+
     x_offset, y_offset = 150, 150
+    cell_width = image_size + row_gap
     for img_path in image_list:
         if img_path is None:
             x_offset = 150
-            y_offset += 120
+            y_offset += image_size + row_gap
             continue
         if not img_path or not os.path.exists(img_path):
             continue
-        img = Image.open(img_path).convert("RGBA").resize((100, 100))
+        img = Image.open(img_path).convert("RGBA").resize((image_size, image_size))
         base_img.paste(img, (x_offset, y_offset), img)
-        x_offset += 120
+        x_offset += cell_width
         if x_offset > 1000:
             x_offset = 150
-            y_offset += 120
+            y_offset += image_size + row_gap
 
     buf = io.BytesIO()
     base_img.save(buf, format="PNG")
