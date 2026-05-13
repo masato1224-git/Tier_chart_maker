@@ -17,10 +17,10 @@
     <h1>Tier表メーカー - 完成!</h1>
     
     <h2>生成結果:</h2>
-    <img src="data:image/png;base64,{{ img_data }}" class="preview" alt="生成結果">
+    <img src="{{ url_for('preview_image') }}" class="preview" alt="生成結果">
     
     <div>
-        <a href="data:image/png;base64,{{ img_data }}" download="tier_list.png">
+        <a href="{{ url_for('download_image') }}">
             <button>画像をダウンロード</button>
         </a>
         <a href="{{ url_for('index') }}">

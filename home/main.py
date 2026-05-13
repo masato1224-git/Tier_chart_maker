@@ -71,6 +71,73 @@ def save_uploaded_file(file_storage, prefix):
     return path
 
 
+def build_preview_image():
+    title = session.get('title')
+    title_color = session.get('title_color')
+    title_weight = session.get('title_weight', 0)
+    title_size = session.get('title_size', 40)
+    x_label = session.get('x_label')
+    x_label_color = session.get('x_label_color', session.get('x_color'))
+    x_arrow_color = session.get('x_arrow_color', session.get('x_color', x_label_color))
+    x_weight = session.get('x_weight', 0)
+    x_size = session.get('x_size', 24)
+    y_label = session.get('y_label')
+    y_label_color = session.get('y_label_color', session.get('y_color'))
+    y_arrow_color = session.get('y_arrow_color', session.get('y_color', y_label_color))
+    y_weight = session.get('y_weight', 0)
+    y_size = session.get('y_size', 24)
+    bg_file_path = session.get('bg_file_path')
+    image_list = session.get('image_list', [])
+
+    if bg_file_path and os.path.exists(bg_file_path):
+        base_img = Image.open(bg_file_path).convert("RGBA").resize((1200, 800))
+    else:
+        base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
+
+    draw = ImageDraw.Draw(base_img)
+    title_font = load_font(max(24, title_size))
+    y_axis_font = load_font(max(16, y_size))
+    x_axis_font = load_font(max(16, x_size))
+
+    title_color = normalize_color(title_color, '#ffffff')
+    x_label_color = normalize_color(x_label_color, '#ffffff')
+    x_arrow_color = normalize_color(x_arrow_color, x_label_color)
+    y_label_color = normalize_color(y_label_color, '#ffffff')
+    y_arrow_color = normalize_color(y_arrow_color, y_label_color)
+
+    title_bbox = draw.textbbox((0, 0), title, font=title_font)
+    title_width = title_bbox[2] - title_bbox[0]
+    title_x = 1200 - title_width - 20
+    draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
+    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    draw.text((500, 720), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
+
+    draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
+    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
+    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
+    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
+
+    x_offset, y_offset = 150, 150
+    for img_path in image_list:
+        if img_path is None:
+            x_offset = 150
+            y_offset += 120
+            continue
+        if not img_path or not os.path.exists(img_path):
+            continue
+        img = Image.open(img_path).convert("RGBA").resize((100, 100))
+        base_img.paste(img, (x_offset, y_offset), img)
+        x_offset += 120
+        if x_offset > 1000:
+            x_offset = 150
+            y_offset += 120
+
+    buf = io.BytesIO()
+    base_img.save(buf, format="PNG")
+    buf.seek(0)
+    return buf
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     app.logger.info("Index function called")  # デバッグ用
@@ -155,162 +222,22 @@ def place_images():
 def generate_final():
     if 'title' not in session or 'image_list' not in session:
         return redirect(url_for('index'))
-    
-    # 設定を取得
-    title = session.get('title')
-    title_color = session.get('title_color')
-    title_weight = session.get('title_weight', 0)
-    title_size = session.get('title_size', 40)
-    x_label = session.get('x_label')
-    x_label_color = session.get('x_label_color', session.get('x_color'))
-    x_arrow_color = session.get('x_arrow_color', session.get('x_color', x_label_color))
-    x_weight = session.get('x_weight', 0)
-    x_size = session.get('x_size', 24)
-    y_label = session.get('y_label')
-    y_label_color = session.get('y_label_color', session.get('y_color'))
-    y_arrow_color = session.get('y_arrow_color', session.get('y_color', y_label_color))
-    y_weight = session.get('y_weight', 0)
-    y_size = session.get('y_size', 24)
-    text_weight = session.get('text_weight', 0)
-    text_size = session.get('text_size', 40)
-    bg_file_path = session.get('bg_file_path')
-    image_list = session.get('image_list', [])
-    
-    # 背景画像をセット
-    if bg_file_path and os.path.exists(bg_file_path):
-        base_img = Image.open(bg_file_path).convert("RGBA").resize((1200, 800))
-    else:
-        base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
-    
-    draw = ImageDraw.Draw(base_img)
-    title_font = load_font(max(24, title_size))
-    y_axis_font = load_font(max(16, y_size))
-    x_axis_font = load_font(max(16, x_size))
-    
-    title_color = normalize_color(title_color, '#ffffff')
-    x_label_color = normalize_color(x_label_color, '#ffffff')
-    x_arrow_color = normalize_color(x_arrow_color, x_label_color)
-    y_label_color = normalize_color(y_label_color, '#ffffff')
-    y_arrow_color = normalize_color(y_arrow_color, y_label_color)
-    
-    # タイトルと軸ラベルを描画
-    draw.text((950, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
-    draw.text((500, 750), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
-    
-    # 軸の矢印を描画
-    # 縦軸 (Y軸)
-    draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
-    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
-    
-    # 横軸 (X軸)
-    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
-    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
-    
-    # 画像を配置
-    x_offset, y_offset = 150, 150
-    for img_path in image_list:
-        if img_path is None:
-            # 改行
-            x_offset = 150
-            y_offset += 120
-            continue
-        if not img_path or not os.path.exists(img_path):
-            continue
-        img = Image.open(img_path).convert("RGBA").resize((100, 100))
-        base_img.paste(img, (x_offset, y_offset), img)
-        x_offset += 120
-        if x_offset > 1000:
-            x_offset = 150
-            y_offset += 120
-    
-    # ブラウザ表示用にbase64エンコード
-    buf = io.BytesIO()
-    base_img.save(buf, format="PNG")
-    img_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-    
-    return render_template('step3_result.html', img_data=img_data)
+    return render_template('step3_result.html')
 
 @app.route('/preview_image')
 def preview_image():
-    #プレビュー画像を返す
     if 'title' not in session:
         return redirect(url_for('index'))
-    
-    title = session.get('title')
-    title_color = session.get('title_color')
-    title_weight = session.get('title_weight', 0)
-    title_size = session.get('title_size', 40)
-    x_label = session.get('x_label')
-    x_label_color = session.get('x_label_color', session.get('x_color'))
-    x_arrow_color = session.get('x_arrow_color', session.get('x_color', x_label_color))
-    x_weight = session.get('x_weight', 0)
-    x_size = session.get('x_size', 24)
-    y_label = session.get('y_label')
-    y_label_color = session.get('y_label_color', session.get('y_color'))
-    y_arrow_color = session.get('y_arrow_color', session.get('y_color', y_label_color))
-    y_weight = session.get('y_weight', 0)
-    y_size = session.get('y_size', 24)
-    text_weight = session.get('text_weight', 0)
-    text_size = session.get('text_size', 40)
-    bg_file_path = session.get('bg_file_path')
-    image_list = session.get('image_list', [])
-    
-    if bg_file_path and os.path.exists(bg_file_path):
-        base_img = Image.open(bg_file_path).convert("RGBA").resize((1200, 800))
-    else:
-        base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
-    
-    draw = ImageDraw.Draw(base_img)
-    title_font = load_font(max(24, title_size))
-    y_axis_font = load_font(max(16, y_size))
-    x_axis_font = load_font(max(16, x_size))
-    
-    title_color = normalize_color(title_color, '#ffffff')
-    x_label_color = normalize_color(x_label_color, '#ffffff')
-    x_arrow_color = normalize_color(x_arrow_color, x_label_color)
-    y_label_color = normalize_color(y_label_color, '#ffffff')
-    y_arrow_color = normalize_color(y_arrow_color, y_label_color)
-    
-    # タイトルの配置を右端に合わせる
-    title_bbox = draw.textbbox((0, 0), title, font=title_font)
-    title_width = title_bbox[2] - title_bbox[0]
-    title_x = 1200 - title_width - 20  # 右端から20px余白
-    draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    
-    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
-    draw.text((500, 750), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
-    
-    # 軸の矢印を描画
-    # 縦軸 (Y軸)
-    draw.line([(100, 120), (100, 700)], fill=y_arrow_color, width=5)
-    draw.polygon([(90, 120), (110, 120), (100, 100)], fill=y_arrow_color)
-    
-    # 横軸 (X軸)
-    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
-    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
-    
-    x_offset, y_offset = 150, 150
-    for img_path in image_list:
-        if img_path is None:
-            # 改行
-            x_offset = 150
-            y_offset += 120
-            continue
-        if not img_path or not os.path.exists(img_path):
-            continue
-        img = Image.open(img_path).convert("RGBA").resize((100, 100))
-        base_img.paste(img, (x_offset, y_offset), img)
-        x_offset += 120
-        if x_offset > 1000:
-            x_offset = 150
-            y_offset += 120
-    
-    buf = io.BytesIO()
-    base_img.save(buf, format="PNG")
-    buf.seek(0)
-    
+    buf = build_preview_image()
     return send_file(buf, mimetype='image/png')
+
+
+@app.route('/download_image')
+def download_image():
+    if 'title' not in session:
+        return redirect(url_for('index'))
+    buf = build_preview_image()
+    return send_file(buf, mimetype='image/png', as_attachment=True, download_name='tier_list.png')
 
 @app.route('/api/image_list')
 def api_image_list():
