@@ -9,9 +9,63 @@ from home import app
 UPLOAD_DIR = os.path.join(os.getcwd(), os.environ.get('UPLOAD_DIR', 'tmp_uploads'))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def load_font(size):
+FONT_FAMILY_MAP = {
+    'Arial': ['arial.ttf', 'Arial.ttf', 'LiberationSans-Regular.ttf', 'DejaVuSans.ttf'],
+    'Times New Roman': ['times.ttf', 'Times New Roman.ttf', 'LiberationSerif-Regular.ttf', 'DejaVuSerif.ttf'],
+    'Courier New': ['cour.ttf', 'Courier New.ttf', 'LiberationMono-Regular.ttf', 'DejaVuSansMono.ttf'],
+    'DejaVu Sans': ['DejaVuSans.ttf', 'LiberationSans-Regular.ttf', 'arial.ttf', 'Arial.ttf'],
+    'Default': ['arial.ttf', 'Arial.ttf', 'LiberationSans-Regular.ttf', 'DejaVuSans.ttf'],
+}
+
+FONT_DIRS = [
+    os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts'),
+    '/usr/share/fonts/truetype',
+    '/usr/share/fonts',
+]
+
+
+def find_font_path(candidate):
+    if not candidate:
+        return None
+    if os.path.isabs(candidate) and os.path.exists(candidate):
+        return candidate
+    if os.path.exists(candidate):
+        return candidate
+    lower_candidate = candidate.lower()
+    for fonts_dir in FONT_DIRS:
+        path = os.path.join(fonts_dir, candidate)
+        if os.path.exists(path):
+            return path
+
+    for fonts_dir in FONT_DIRS:
+        if not os.path.isdir(fonts_dir):
+            continue
+        for root, _, files in os.walk(fonts_dir):
+            for filename in files:
+                if filename.lower() == lower_candidate:
+                    return os.path.join(root, filename)
+    return None
+
+
+def load_font(family, size):
+    if not family:
+        family = 'Default'
+    candidates = FONT_FAMILY_MAP.get(family, [])
+    for candidate in candidates:
+        path = find_font_path(candidate)
+        if path:
+            try:
+                return ImageFont.truetype(path, size)
+            except OSError:
+                continue
+        try:
+            return ImageFont.truetype(candidate, size)
+        except OSError:
+            continue
+
+    # 最後の手段として PIL に同梱されている DejaVu フォントを使う
     try:
-        return ImageFont.truetype("arial.ttf", size)
+        return ImageFont.truetype('DejaVuSans.ttf', size)
     except OSError:
         return ImageFont.load_default()
 
@@ -93,9 +147,12 @@ def build_preview_image():
         base_img = Image.new("RGBA", (1200, 800), (40, 44, 52, 255))
 
     draw = ImageDraw.Draw(base_img)
-    title_font = load_font(max(24, title_size))
-    y_axis_font = load_font(max(16, y_size))
-    x_axis_font = load_font(max(16, x_size))
+    title_font_family = session.get('title_font_family', 'Arial')
+    y_axis_font_family = session.get('y_font_family', 'Arial')
+    x_axis_font_family = session.get('x_font_family', 'Arial')
+    title_font = load_font(title_font_family, max(24, title_size))
+    y_axis_font = load_font(y_axis_font_family, max(16, y_size))
+    x_axis_font = load_font(x_axis_font_family, max(16, x_size))
 
     title_color = normalize_color(title_color, '#ffffff')
     x_label_color = normalize_color(x_label_color, '#ffffff')
@@ -107,7 +164,7 @@ def build_preview_image():
     title_width = title_bbox[2] - title_bbox[0]
     title_x = 1200 - title_width - 20
     draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    draw.text((10, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     draw.text((1100, 680), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
@@ -174,6 +231,7 @@ def index():
         session['title_color'] = normalize_color(request.form.get('title_color', '#ffffff'))
         session['title_weight'] = int(request.form.get('title_weight', 0) or 0)
         session['title_size'] = int(request.form.get('title_size', 40) or 40)
+        session['title_font_family'] = request.form.get('title_font_family', 'Arial')
         session['x_label'] = request.form.get('x_label', 'Width')
         session['x_label_color'] = normalize_color(request.form.get('x_label_color', '#ffffff'))
         session['x_arrow_color'] = normalize_color(request.form.get('x_arrow_color', request.form.get('x_label_color', '#ffffff')))
@@ -184,6 +242,8 @@ def index():
         session['y_label_color'] = normalize_color(request.form.get('y_label_color', '#ffffff'))
         session['y_arrow_color'] = normalize_color(request.form.get('y_arrow_color', request.form.get('y_label_color', '#ffffff')))
         session['y_color'] = session['y_label_color']
+        session['y_font_family'] = request.form.get('y_font_family', 'Arial')
+        session['x_font_family'] = request.form.get('x_font_family', 'Arial')
         session['y_weight'] = int(request.form.get('y_weight', 0) or 0)
         session['y_size'] = int(request.form.get('y_size', 24) or 24)
         session['text_weight'] = int(request.form.get('text_weight', 0) or 0)
@@ -219,6 +279,9 @@ def index():
         x_size = session.get('x_size', 24),
         text_weight = session.get('text_weight', 1),
         text_size = session.get('text_size', 40),
+        title_font_family = session.get('title_font_family', 'Arial'),
+        y_font_family = session.get('y_font_family', 'Arial'),
+        x_font_family = session.get('x_font_family', 'Arial'),
     )
 
 @app.route('/place_images', methods=['GET', 'POST'])

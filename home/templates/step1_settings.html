@@ -156,6 +156,16 @@
                     <span class="value-display" id="title_size_value">{{ title_size }}</span>px
                 </div>
             </div>
+            <div class="setting-row">
+                <span class="setting-label">フォント:</span>
+                <div class="setting-input">
+                    <select name="title_font_family">
+                        <option value="Times New Roman" {% if title_font_family == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+                        <option value="Courier New" {% if title_font_family == 'Courier New' %}selected{% endif %}>Courier New</option>
+                        <option value="Default" {% if title_font_family == 'Default' %}selected{% endif %}>Default</option>
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="form-group">
@@ -198,6 +208,16 @@
                     <span class="value-display" id="y_size_value">{{ y_size }}</span>px
                 </div>
             </div>
+            <div class="setting-row">
+                <span class="setting-label">フォント:</span>
+                <div class="setting-input">
+                    <select name="y_font_family">
+                        <option value="Times New Roman" {% if y_font_family == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+                        <option value="Courier New" {% if y_font_family == 'Courier New' %}selected{% endif %}>Courier New</option>
+                        <option value="Default" {% if y_font_family == 'Default' %}selected{% endif %}>Default</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -238,6 +258,16 @@
                 <div class="range-container">
                     <input type="range" name="x_size" id="x_size" min="16" max="72" value="{{ x_size }}">
                     <span class="value-display" id="x_size_value">{{ x_size }}</span>px
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">フォント:</span>
+                <div class="setting-input">
+                    <select name="x_font_family">
+                        <option value="Times New Roman" {% if x_font_family == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+                        <option value="Courier New" {% if x_font_family == 'Courier New' %}selected{% endif %}>Courier New</option>
+                        <option value="Default" {% if x_font_family == 'Default' %}selected{% endif %}>Default</option>
+                    </select>
                 </div>
             </div>
         </div>
