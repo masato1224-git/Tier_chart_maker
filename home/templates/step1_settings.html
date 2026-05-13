@@ -58,11 +58,44 @@
             font-weight: bold; 
             color: #4CAF50; 
         }
-        input[type="text"], input[type="color"], input[type="file"] { 
-            padding: 8px; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
+        input[type="color"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 60px;
+            height: 40px;
+            cursor: pointer;
+            background: none;
         }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+        input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+        .color-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .color-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 3px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .color-input-wrapper input[type="color"] {
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+        }
+
+
         input[type="range"] { 
             padding: 5px 0; 
         }
@@ -102,7 +135,10 @@
             <div class="setting-row">
                 <span class="setting-label">タイトルの色:</span>
                 <div class="setting-input">
-                    <input type="color" name="title_color" value="{{ title_color }}">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="titleColorPreview"></div>
+                        <input type="color" name="title_color" value="{{ title_color }}">
+                    </div>
                 </div>
             </div>
             <div class="setting-row">
@@ -132,13 +168,19 @@
             <div class="setting-row">
                 <span class="setting-label">ラベルの色:</span>
                 <div class="setting-input">
-                    <input type="color" name="y_label_color" value="{{ y_label_color }}">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="yLabelColorPreview"></div>
+                        <input type="color" name="y_label_color" value="{{ y_label_color }}">
+                    </div>
                 </div>
             </div>
             <div class="setting-row">
                 <span class="setting-label">矢印の色:</span>
                 <div class="setting-input">
-                    <input type="color" name="y_arrow_color" value="{{ y_arrow_color }}">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="yArrowColorPreview"></div>
+                        <input type="color" name="y_arrow_color" value="{{ y_arrow_color }}">
+                    </div>
                 </div>
             </div>
             <div class="setting-row">
@@ -168,13 +210,19 @@
             <div class="setting-row">
                 <span class="setting-label">ラベルの色:</span>
                 <div class="setting-input">
-                    <input type="color" name="x_label_color" value="{{ x_label_color }}">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="xLabelColorPreview"></div>
+                        <input type="color" name="x_label_color" value="{{ x_label_color }}">
+                    </div>
                 </div>
             </div>
             <div class="setting-row">
                 <span class="setting-label">矢印の色:</span>
                 <div class="setting-input">
-                    <input type="color" name="x_arrow_color" value="{{ x_arrow_color }}">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="xArrowColorPreview"></div>
+                        <input type="color" name="x_arrow_color" value="{{ x_arrow_color }}">
+                    </div>
                 </div>
             </div>
             <div class="setting-row">
@@ -243,6 +291,24 @@
         xSizeInput.addEventListener('input', () => {
             xSizeValue.textContent = xSizeInput.value;
         });
+
+        // 色プレビューの更新関数
+        function updateColorPreviews() {
+            document.getElementById('titleColorPreview').style.backgroundColor = document.querySelector('input[name="title_color"]').value;
+            document.getElementById('yLabelColorPreview').style.backgroundColor = document.querySelector('input[name="y_label_color"]').value;
+            document.getElementById('yArrowColorPreview').style.backgroundColor = document.querySelector('input[name="y_arrow_color"]').value;
+            document.getElementById('xLabelColorPreview').style.backgroundColor = document.querySelector('input[name="x_label_color"]').value;
+            document.getElementById('xArrowColorPreview').style.backgroundColor = document.querySelector('input[name="x_arrow_color"]').value;
+        }
+
+        // 初期化とイベントリスナー
+        document.addEventListener('DOMContentLoaded', function() {
+            updateColorPreviews();
+            document.querySelectorAll('input[type="color"]').forEach(function(input) {
+                input.addEventListener('input', updateColorPreviews);
+            });
+        });
     </script>
+
 </body>
 </html>
