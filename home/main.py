@@ -164,7 +164,7 @@ def build_preview_image():
     title_width = title_bbox[2] - title_bbox[0]
     title_x = 1200 - title_width - 20
     draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((10, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    draw.text((30, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     draw.text((1100, 680), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
