@@ -152,6 +152,9 @@ def build_preview_image():
     y_axis_font = load_font(y_axis_font_family, max(16, y_size))
     x_axis_font = load_font(x_axis_font_family, max(16, x_size))
 
+    title_box_enabled = session.get('title_box_enabled', False)
+    title_box_color = normalize_color(session.get('title_box_color', '#000000'))
+
     title_color = normalize_color(title_color, '#ffffff')
     x_label_color = normalize_color(x_label_color, '#ffffff')
     x_arrow_color = normalize_color(x_arrow_color, x_label_color)
@@ -160,8 +163,18 @@ def build_preview_image():
 
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
+    title_height = title_bbox[3] - title_bbox[1]
     title_x = 1200 - title_width - 20
-    draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
+    title_y = 30
+    if title_box_enabled:
+        padding = 16
+        box_left = title_x - padding
+        box_top = title_y - padding
+        box_right = title_x + title_width + padding
+        box_bottom = title_y + title_height + padding
+        draw.rectangle([(box_left, box_top), (box_right, box_bottom)], fill=title_box_color)
+
+    draw.text((title_x, title_y), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
     draw.text((30, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     draw.text((1100, 680), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
@@ -230,6 +243,8 @@ def index():
         session['title_weight'] = int(request.form.get('title_weight', 0) or 0)
         session['title_size'] = int(request.form.get('title_size', 40) or 40)
         session['title_font_family'] = request.form.get('title_font_family', 'Default')
+        session['title_box_enabled'] = request.form.get('title_box_enabled') == 'on'
+        session['title_box_color'] = normalize_color(request.form.get('title_box_color', '#000000'))
         session['x_label'] = request.form.get('x_label', 'Width')
         session['x_label_color'] = normalize_color(request.form.get('x_label_color', '#ffffff'))
         session['x_arrow_color'] = normalize_color(request.form.get('x_arrow_color', request.form.get('x_label_color', '#ffffff')))
@@ -278,6 +293,8 @@ def index():
         text_weight = session.get('text_weight', 1),
         text_size = session.get('text_size', 40),
         title_font_family = session.get('title_font_family', 'Default'),
+        title_box_enabled = session.get('title_box_enabled', False),
+        title_box_color = session.get('title_box_color', '#000000'),
         y_font_family = session.get('y_font_family', 'Default'),
         x_font_family = session.get('x_font_family', 'Default'),
     )
