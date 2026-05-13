@@ -108,12 +108,12 @@ def build_preview_image():
     title_x = 1200 - title_width - 20
     draw.text((title_x, 30), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
     draw.text((50, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
-    draw.text((500, 720), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
+    draw.text((1100, 680), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
     draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
-    draw.polygon([(1100, 690), (1100, 710), (1120, 700)], fill=x_arrow_color)
+    draw.polygon([(1080, 690), (1080, 710), (1100, 700)], fill=x_arrow_color)
 
     max_cols = 8
     row_gap = 20
