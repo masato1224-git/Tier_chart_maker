@@ -2,10 +2,8 @@ from flask import Flask, render_template, request, redirect,send_file, url_for, 
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont
 import io
-import base64
 import os
 import uuid
-import logging
 from home import app
 
 UPLOAD_DIR = os.path.join(os.getcwd(), os.environ.get('UPLOAD_DIR', 'tmp_uploads'))
@@ -178,22 +176,22 @@ def index():
     
     return render_template(
         'step1_settings.html',
-        title=session.get('title', 'My Best Games'),
-        title_color=session.get('title_color', "#ffffff"),
-        title_weight=session.get('title_weight', 0),
-        title_size=session.get('title_size', 40),
-        y_label=session.get('y_label', 'Quality'),
-        y_label_color=session.get('y_label_color', session.get('y_color', '#ff0000')),
-        y_arrow_color=session.get('y_arrow_color', session.get('y_color', '#ff0000')),
-        y_weight=session.get('y_weight', 0),
-        y_size=session.get('y_size', 24),
-        x_label=session.get('x_label', 'Enjoyment'),
-        x_label_color=session.get('x_label_color', session.get('x_color', '#00ff00')),
-        x_arrow_color=session.get('x_arrow_color', session.get('x_color', '#00ff00')),
-        x_weight=session.get('x_weight', 0),
-        x_size=session.get('x_size', 24),
-        text_weight=session.get('text_weight', 1),
-        text_size=session.get('text_size', 40),
+        title = session.get('title', 'My Best Games'),
+        title_color = session.get('title_color', "#ffffff"),
+        title_weight = session.get('title_weight', 0),
+        title_size = session.get('title_size', 40),
+        y_label = session.get('y_label', 'Quality'),
+        y_label_color = session.get('y_label_color', session.get('y_color', '#ff0000')),
+        y_arrow_color = session.get('y_arrow_color', session.get('y_color', '#ff0000')),
+        y_weight = session.get('y_weight', 0),
+        y_size = session.get('y_size', 24),
+        x_label = session.get('x_label', 'Enjoyment'),
+        x_label_color = session.get('x_label_color', session.get('x_color', '#00ff00')),
+        x_arrow_color = session.get('x_arrow_color', session.get('x_color', '#00ff00')),
+        x_weight = session.get('x_weight', 0),
+        x_size = session.get('x_size', 24),
+        text_weight = session.get('text_weight', 1),
+        text_size = session.get('text_size', 40),
     )
 
 @app.route('/place_images', methods=['GET', 'POST'])
