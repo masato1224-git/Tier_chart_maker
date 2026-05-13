@@ -138,8 +138,23 @@
                 <span class="setting-label">タイトルの色:</span>
                 <div class="setting-input">
                     <div class="color-input-wrapper">
-                        <div class="color-preview" id="titleColorPreview"></div>
+                        <div class="color-preview" id="titleColorPreview" style="background-color: {{ title_color }}"></div>
                         <input type="color" name="title_color" value="{{ title_color }}">
+                    </div>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">タイトル背景を有効化:</span>
+                <div class="setting-input">
+                    <input type="checkbox" name="title_box_enabled" id="title_box_enabled" {% if title_box_enabled %}checked{% endif %}>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">タイトル背景色:</span>
+                <div class="setting-input">
+                    <div class="color-input-wrapper">
+                        <div class="color-preview" id="titleBoxColorPreview" style="background-color: {{ title_box_color }}"></div>
+                        <input type="color" name="title_box_color" value="{{ title_box_color }}">
                     </div>
                 </div>
             </div>
@@ -327,6 +342,7 @@
         // 色プレビューの更新関数
         function updateColorPreviews() {
             document.getElementById('titleColorPreview').style.backgroundColor = document.querySelector('input[name="title_color"]').value;
+            document.getElementById('titleBoxColorPreview').style.backgroundColor = document.querySelector('input[name="title_box_color"]').value;
             document.getElementById('yLabelColorPreview').style.backgroundColor = document.querySelector('input[name="y_label_color"]').value;
             document.getElementById('yArrowColorPreview').style.backgroundColor = document.querySelector('input[name="y_arrow_color"]').value;
             document.getElementById('xLabelColorPreview').style.backgroundColor = document.querySelector('input[name="x_label_color"]').value;
