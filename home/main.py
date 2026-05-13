@@ -240,7 +240,8 @@ def place_images():
         if 'generate' in request.form:
             return redirect(url_for('generate_final'))
     
-    image_count = len(session.get('image_list', []))
+    image_list = session.get('image_list', [])
+    image_count = sum(1 for item in image_list if item is not None)
     return render_template('step2_place_images.html', image_count=image_count)
 
 @app.route('/generate_final')
