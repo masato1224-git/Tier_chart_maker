@@ -167,7 +167,7 @@ def build_preview_image():
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
-    draw.line([(100, 700), (1100, 700)], fill=x_arrow_color, width=5)
+    draw.line([(100, 700), (1080, 700)], fill=x_arrow_color, width=5)
     draw.polygon([(1080, 690), (1080, 710), (1100, 700)], fill=x_arrow_color)
 
     max_cols = 8
