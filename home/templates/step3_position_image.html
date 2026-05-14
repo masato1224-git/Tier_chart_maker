@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Tier Chart Maker - 位置指定で画像追加</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .container { display: flex; gap: 20px; }
+        .form-section { flex: 1; }
+        .preview-section { flex: 1; }
+        .form-group { margin-bottom: 15px; padding-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="file"], input[type="number"] { padding: 8px; width: 100%; box-sizing: border-box; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #45a049; }
+        button.secondary { background: #2196F3; }
+        button.secondary:hover { background: #0b7dda; }
+        .preview { border: 2px solid #333; max-width: 100%; margin-top: 10px; }
+        .info { background: #e3f2fd; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        .error-box { background: #ffe6e6; border: 1px solid #ff6f6f; color: #a70000; padding: 12px; border-radius: 4px; margin-bottom: 15px; }
+        .row-info { background: #fff8e1; border: 1px solid #ffecb3; padding: 12px; border-radius: 4px; margin-bottom: 15px; }
+        ul { margin: 0; padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Tier表メーカー - ステップ3: 位置指定で画像追加</h1>
+    <div class="info">
+        画像を指定した行と列に挿入できます。現在の行数より大きい行を入力した場合はエラーになります。
+    </div>
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+    <div class="row-info">
+        <p>現在の行数: <strong>{{ row_count }}</strong> 行</p>
+        <p>各行の画像数:</p>
+        <ul>
+            {% for len in row_lengths %}
+                <li>行 {{ loop.index }}: {{ len }} 枚</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="container">
+        <div class="form-section">
+            <form method="POST" action="{{ url_for('position_image') }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>画像を選択:</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>上から何行目に追加するか:</label>
+                    <input type="number" name="row" min="1" max="{{ row_count }}" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label>左から何列目に追加するか:</label>
+                    <input type="number" name="col" min="1" max="8" value="1" required>
+                </div>
+                <button type="submit">指定位置に画像を追加</button>
+            </form>
+            <form action="{{ url_for('generate_final') }}" method="GET" style="margin-top: 20px;">
+                <button type="submit" class="secondary">次へ → 完成ページへ</button>
+            </form>
+            <form action="{{ url_for('place_images') }}" method="GET" style="margin-top: 10px;">
+                <button type="submit" class="secondary">前のページに戻る</button>
+            </form>
+        </div>
+        <div class="preview-section">
+            <h3>プレビュー</h3>
+            <img src="{{ url_for('preview_image') }}" class="preview" alt="プレビュー">
+            <p style="font-size: 12px; color: #666;">現在の画像配置のプレビューです。位置を指定して追加する前に確認できます。</p>
+        </div>
+    </div>
+</body>
+</html>

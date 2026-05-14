@@ -54,8 +54,8 @@
                 
             </div>
             
-            <form method="POST" action="{{ url_for('place_images') }}">
-                <button type="submit" name="generate" value="1" style="background: #ff9800;">完了 → 最終結果を表示</button>
+            <form action="{{ url_for('position_image') }}" method="GET">
+                <button type="submit" style="background: #ff9800;">次へ → 位置指定で画像追加</button>
             </form>
             
             <form action="{{ url_for('index') }}" style="margin-top: 20px;">

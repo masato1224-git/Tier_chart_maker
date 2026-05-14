@@ -239,8 +239,117 @@ def build_preview_image():
     return buf
 
 
+def split_image_rows(image_list, max_cols=8):
+    rows = []
+    current = []
+    for img in image_list:
+        if img is None:
+            rows.append(current)
+            current = []
+            continue
+        current.append(img)
+        if len(current) >= max_cols:
+            rows.append(current)
+            current = []
+    rows.append(current)
+    return rows
+
+
+def get_row_insert_index(image_list, target_row, target_col, max_cols=8):
+    rows = []
+    row_start_indices = []
+    current = []
+    current_row_start = 0
+    current_col = 0
+    idx = 0
+
+    for img in image_list:
+        if img is None:
+            rows.append(current)
+            row_start_indices.append(current_row_start)
+            current = []
+            current_row_start = idx + 1
+            current_col = 0
+            idx += 1
+            continue
+
+        if current_col >= max_cols:
+            rows.append(current)
+            row_start_indices.append(current_row_start)
+            current = []
+            current_row_start = idx
+            current_col = 0
+
+        current.append(img)
+        current_col += 1
+        idx += 1
+
+    rows.append(current)
+    row_start_indices.append(current_row_start)
+
+    if target_row < 1 or target_row > len(rows):
+        return None, rows
+
+    row = rows[target_row - 1]
+    if target_col < 1 or target_col > max_cols or target_col > len(row) + 1:
+        return None, rows
+
+    insert_index = row_start_indices[target_row - 1] + min(target_col - 1, len(row))
+    return insert_index, rows
+
+
+@app.route('/position_image', methods=['GET', 'POST'])
+def position_image():
+    if 'title' not in session or 'image_list' not in session:
+        return redirect(url_for('index'))
+
+    image_list = session.get('image_list', [])
+    max_cols = 8
+    error = None
+    rows = split_image_rows(image_list, max_cols)
+    row_count = len(rows)
+    row_lengths = [len(row) for row in rows]
+
+    if request.method == 'POST':
+        try:
+            row = int(request.form.get('row', '0') or 0)
+            col = int(request.form.get('col', '0') or 0)
+        except ValueError:
+            error = '行と列は数値で入力してください。'
+        else:
+            if row < 1 or row > row_count:
+                error = f'行は1から{row_count}の間で指定してください。'
+            elif col < 1 or col > max_cols:
+                error = f'列は1から{max_cols}の間で指定してください。'
+            elif col > len(rows[row - 1]) + 1:
+                error = f'行{row}には現在{len(rows[row - 1])}枚の画像があり、追加可能な列は最大{len(rows[row - 1]) + 1}です。'
+            else:
+                image_file = request.files.get('image')
+                if not image_file or image_file.filename == '':
+                    error = '画像ファイルを選択してください。'
+                else:
+                    image_path = save_uploaded_file(image_file, 'item')
+                    if image_path:
+                        insert_index, _ = get_row_insert_index(image_list, row, col, max_cols)
+                        if insert_index is None:
+                            error = '指定位置に画像を追加できませんでした。'
+                        else:
+                            image_list.insert(insert_index, image_path)
+                            session['image_list'] = image_list
+                            session.modified = True
+                            return redirect(url_for('position_image'))
+
+    return render_template(
+        'step3_position_image.html',
+        error=error,
+        row_count=row_count,
+        row_lengths=row_lengths,
+    )
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
+
     app.logger.info("Index function called")  # デバッグ用
     if request.method == 'POST':
         # 過去のアップロードを削除してから新規設定を保存
@@ -334,7 +443,7 @@ def place_images():
 def generate_final():
     if 'title' not in session or 'image_list' not in session:
         return redirect(url_for('index'))
-    return render_template('step3_result.html')
+    return render_template('step4_result.html')
 
 @app.route('/preview_image')
 def preview_image():
