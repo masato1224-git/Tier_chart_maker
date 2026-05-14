@@ -175,8 +175,16 @@ def build_preview_image():
         draw.rectangle([(box_left, box_top), (box_right, box_bottom)], fill=title_box_color)
 
     draw.text((title_x, title_y), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
-    draw.text((30, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
-    draw.text((950, 700),f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
+    y_label_text = f" {y_label}"
+    y_label_bbox = draw.textbbox((0, 0), y_label_text, font=y_axis_font, stroke_width=y_weight)
+    y_label_width = y_label_bbox[2] - y_label_bbox[0]
+    y_label_height = y_label_bbox[3] - y_label_bbox[0]
+    y_label_image = Image.new("RGBA", (y_label_width, y_label_height), (0, 0, 0, 0))
+    y_label_draw = ImageDraw.Draw(y_label_image)
+    y_label_draw.text((0, 0), y_label_text, fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
+    y_label_rotated = y_label_image.rotate(90, expand=True, resample=Image.BICUBIC)
+    base_img.paste(y_label_rotated, (20, 60), y_label_rotated)
+    draw.text((950, 700), f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
