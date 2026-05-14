@@ -320,6 +320,10 @@ def position_image():
         except ValueError:
             error = '行と列は数値で入力してください。'
         else:
+            mode = request.form.get('mode', 'shift')
+            if mode not in ('shift', 'overwrite'):
+                mode = 'shift'
+
             if row < 1 or row > row_count:
                 error = f'行は1から{row_count}の間で指定してください。'
             elif col < 1 or col > max_cols:
@@ -337,7 +341,7 @@ def position_image():
                         if insert_index is None:
                             error = '指定位置に画像を追加できませんでした。'
                         else:
-                            if col <= len(rows[row - 1]):
+                            if mode == 'overwrite' and col <= len(rows[row - 1]):
                                 image_list[insert_index] = image_path
                             else:
                                 image_list.insert(insert_index, image_path)
