@@ -122,6 +122,7 @@ def save_uploaded_file(file_storage, prefix):
 
 
 def build_preview_image():
+    
     title = session.get('title')
     title_color = session.get('title_color')
     title_weight = session.get('title_weight', 0)
@@ -173,8 +174,9 @@ def build_preview_image():
         box_right = title_x + title_width + padding
         box_bottom = title_y + title_height + padding
         draw.rectangle([(box_left, box_top), (box_right, box_bottom)], fill=title_box_color)
-
+    #タイトル配置
     draw.text((title_x, title_y), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
+    #縦軸ラベル配置＆回転
     y_label_text = f" {y_label}"
     y_label_bbox = draw.textbbox((0, 0), y_label_text, font=y_axis_font, stroke_width=y_weight)
     y_label_width = y_label_bbox[2] - y_label_bbox[0]
@@ -184,8 +186,10 @@ def build_preview_image():
     y_label_draw.text((0, 0), y_label_text, fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     y_label_rotated = y_label_image.rotate(90, expand=True, resample=Image.BICUBIC)
     base_img.paste(y_label_rotated, (20, 60), y_label_rotated)
+    #横軸ラベル配置
     draw.text((950, 700), f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
-
+    
+    #矢印描画
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
     draw.line([(100, 700), (1080, 700)], fill=x_arrow_color, width=5)
