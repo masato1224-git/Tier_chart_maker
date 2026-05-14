@@ -294,7 +294,10 @@ def get_row_insert_index(image_list, target_row, target_col, max_cols=8):
     if target_col < 1 or target_col > max_cols or target_col > len(row) + 1:
         return None, rows
 
-    insert_index = row_start_indices[target_row - 1] + min(target_col - 1, len(row))
+    if target_col <= len(row):
+        insert_index = row_start_indices[target_row - 1] + target_col - 1
+    else:
+        insert_index = row_start_indices[target_row - 1] + len(row)
     return insert_index, rows
 
 
@@ -334,7 +337,10 @@ def position_image():
                         if insert_index is None:
                             error = '指定位置に画像を追加できませんでした。'
                         else:
-                            image_list.insert(insert_index, image_path)
+                            if col <= len(rows[row - 1]):
+                                image_list[insert_index] = image_path
+                            else:
+                                image_list.insert(insert_index, image_path)
                             session['image_list'] = image_list
                             session.modified = True
                             return redirect(url_for('position_image'))
