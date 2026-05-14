@@ -176,7 +176,7 @@ def build_preview_image():
 
     draw.text((title_x, title_y), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
     draw.text((30, 60), f" {y_label}", fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
-    draw.text((1100, 680), f" {x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
+    draw.text((950, 700),f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
