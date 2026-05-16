@@ -249,7 +249,7 @@ def build_preview_image():
     return buf
 
 
-def split_image_rows(image_list, max_cols=8):
+def split_image_rows(image_list, max_cols=20):
     rows = []
     current = []
     for img in image_list:
