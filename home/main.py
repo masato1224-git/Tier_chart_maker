@@ -154,13 +154,13 @@ def build_preview_image():
 
     title_box_enabled = session.get('title_box_enabled', False)
     title_box_color = normalize_color(session.get('title_box_color', '#000000'))
-
+    #タイトル、軸ラベルの色正規化
     title_color = normalize_color(title_color, '#ffffff')
     x_label_color = normalize_color(x_label_color, '#ffffff')
     x_arrow_color = normalize_color(x_arrow_color, x_label_color)
     y_label_color = normalize_color(y_label_color, '#ffffff')
     y_arrow_color = normalize_color(y_arrow_color, y_label_color)
-
+    #タイトルボックスのサイズ計算
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
     title_height = title_bbox[3] - title_bbox[1]
@@ -173,7 +173,7 @@ def build_preview_image():
         box_right = title_x + title_width + padding
         box_bottom = title_y + title_height + padding
         draw.rectangle([(box_left, box_top), (box_right, box_bottom)], fill=title_box_color)
-
+    #縦軸ラベル配置設定
     draw.text((title_x, title_y), title, fill=title_color, font=title_font, stroke_width=title_weight, stroke_fill=title_color)
     y_label_text = f" {y_label}"
     y_label_bbox = draw.textbbox((0, 0), y_label_text, font=y_axis_font, stroke_width=y_weight)
@@ -184,13 +184,16 @@ def build_preview_image():
     y_label_draw.text((0, 0), y_label_text, fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     y_label_rotated = y_label_image.rotate(90, expand=True, resample=Image.BICUBIC)
     base_img.paste(y_label_rotated, (20, 60), y_label_rotated)
+    #横軸ラベル配置設定
     draw.text((950, 700), f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
 
+    #軸の矢印描画
     draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
     draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
     draw.line([(100, 700), (1080, 700)], fill=x_arrow_color, width=5)
     draw.polygon([(1080, 690), (1080, 710), (1100, 700)], fill=x_arrow_color)
 
+    #画像の配置
     max_cols = 8
     row_gap = 20
     max_bottom = 700 - 20
