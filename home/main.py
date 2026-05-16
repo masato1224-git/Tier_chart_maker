@@ -317,7 +317,7 @@ def position_image():
         return redirect(url_for('index'))
 
     image_list = session.get('image_list', [])
-    max_cols = 8
+    max_cols = 20
     error = None
     rows = split_image_rows(image_list, max_cols)
     row_count = len(rows)
