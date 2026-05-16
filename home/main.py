@@ -155,13 +155,13 @@ def build_preview_image():
 
     title_box_enabled = session.get('title_box_enabled', False)
     title_box_color = normalize_color(session.get('title_box_color', '#000000'))
-
+    #タイトル、軸ラベルの色正規化
     title_color = normalize_color(title_color, '#ffffff')
     x_label_color = normalize_color(x_label_color, '#ffffff')
     x_arrow_color = normalize_color(x_arrow_color, x_label_color)
     y_label_color = normalize_color(y_label_color, '#ffffff')
     y_arrow_color = normalize_color(y_arrow_color, y_label_color)
-
+    #タイトルボックスのサイズ計算
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
     title_height = title_bbox[3] - title_bbox[1]
@@ -195,6 +195,7 @@ def build_preview_image():
     draw.line([(100, 700), (1080, 700)], fill=x_arrow_color, width=5)
     draw.polygon([(1080, 690), (1080, 710), (1100, 700)], fill=x_arrow_color)
 
+    #画像の配置
     max_cols = 8
     row_gap = 20
     max_bottom = 700 - 20
