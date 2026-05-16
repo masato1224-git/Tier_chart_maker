@@ -5,6 +5,7 @@ import io
 import os
 import uuid
 from home import app
+import math
 
 UPLOAD_DIR = os.path.join(os.getcwd(), os.environ.get('UPLOAD_DIR', 'tmp_uploads'))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -185,7 +186,7 @@ def build_preview_image():
     y_label_draw = ImageDraw.Draw(y_label_image)
     y_label_draw.text((0, 0), y_label_text, fill=y_label_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_label_color)
     y_label_rotated = y_label_image.rotate(90, expand=True, resample=Image.BICUBIC)
-    base_img.paste(y_label_rotated, (20, 60), y_label_rotated)
+    base_img.paste(y_label_rotated, (40, 120), y_label_rotated)
     #横軸ラベル配置
     draw.text((950, 700), f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
     
@@ -212,6 +213,10 @@ def build_preview_image():
         if current_col > max_cols:
             rows += 1
             current_col = 1
+        if rows <= 4:    
+         max_cols += math.floor(rows / 4)
+        elif rows >= 5:
+            max_cols += 1
     if current_col > 0:
         rows += 1
 
@@ -234,7 +239,7 @@ def build_preview_image():
         img = Image.open(img_path).convert("RGBA").resize((image_size, image_size))
         base_img.paste(img, (x_offset, y_offset), img)
         x_offset += cell_width
-        if x_offset > 1000:
+        if x_offset > 1100:
          x_offset = 150
          y_offset += image_size + row_gap
 
