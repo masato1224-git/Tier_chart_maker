@@ -234,8 +234,8 @@ def build_preview_image():
         base_img.paste(img, (x_offset, y_offset), img)
         x_offset += cell_width
         if x_offset > 1000:
-            x_offset = 150
-            y_offset += image_size + row_gap
+         x_offset = 150
+         y_offset += image_size + row_gap
 
     buf = io.BytesIO()
     base_img.save(buf, format="PNG")
