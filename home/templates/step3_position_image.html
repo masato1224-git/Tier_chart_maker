@@ -54,6 +54,11 @@
                     <label>左から何列目に追加するか:</label>
                     <input type="number" name="col" min="1" max="8" value="1" required>
                 </div>
+                <div class="form-group">
+                    <label>処理方法:</label>
+                    <label><input type="radio" name="mode" value="shift" checked> 右の列をずらす</label>
+                    <label><input type="radio" name="mode" value="overwrite"> 指定位置の画像を上書き</label>
+                </div>
                 <button type="submit">指定位置に画像を追加</button>
             </form>
             <form action="{{ url_for('generate_final') }}" method="GET" style="margin-top: 20px;">
