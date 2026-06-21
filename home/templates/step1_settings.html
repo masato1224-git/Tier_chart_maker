@@ -211,6 +211,21 @@
                 </div>
             </div>
             <div class="setting-row">
+                <span class="setting-label">縦軸スタイル:</span>
+                <div class="setting-input">
+                    <div style="display: flex; gap: 20px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="radio" name="y_axis_style" value="arrow" {% if y_axis_style == 'arrow' or not y_axis_style %}checked{% endif %}>
+                            矢印
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="radio" name="y_axis_style" value="text" {% if y_axis_style == 'text' %}checked{% endif %}>
+                            文字
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-row">
                 <span class="setting-label">文字の太さ:</span>
                 <div class="range-container">
                     <input type="range" name="y_weight" id="y_weight" min="0" max="10" value="{{ y_weight }}">

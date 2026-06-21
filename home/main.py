@@ -122,6 +122,44 @@ def save_uploaded_file(file_storage, prefix):
     return path
 
 
+def calculate_image_rows(image_list):
+    """画像リストから行数を計算"""
+    max_cols = 8
+    rows = 0
+    current_col = 0
+    for img_path in image_list:
+        if img_path is None:
+            if current_col != 0 or rows == 0:
+                rows += 1
+            current_col = 0
+            continue
+        current_col += 1
+        if current_col > max_cols:
+            rows += 1
+            current_col = 1
+        if rows <= 4:    
+         max_cols += math.floor(rows / 4)
+        elif rows >= 5:
+            max_cols += 1
+    if current_col > 0:
+        rows += 1
+    return max(1, rows)
+
+
+def calculate_image_layout(image_list, top=150, bottom=700, max_cols=8):
+    rows = calculate_image_rows(image_list)
+    row_gap = 20
+    available_height = bottom - top
+    image_size = 100
+    if rows > 0:
+        image_size = min(100, max(20, (available_height - (rows - 1) * row_gap) // rows))
+        if image_size < 40:
+            row_gap = 10
+            image_size = max(20, min(100, (available_height - (rows - 1) * row_gap) // rows))
+    row_centers = [top + i * (image_size + row_gap) + image_size / 2 for i in range(rows)]
+    return rows, image_size, row_gap, row_centers
+
+
 def build_preview_image():
     
     title = session.get('title')
@@ -190,9 +228,34 @@ def build_preview_image():
     #横軸ラベル配置
     draw.text((950, 700), f"{x_label}", fill=x_label_color, font=x_axis_font, stroke_width=x_weight, stroke_fill=x_label_color)
     
-    #矢印描画
-    draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
-    draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
+    #縦軸スタイル処理
+    y_axis_style = session.get('y_axis_style', 'arrow')
+    
+    # 画像の行数とレイアウトを計算
+    num_rows, image_size, row_gap, row_centers = calculate_image_layout(image_list, 150, 700)
+    
+    if y_axis_style == 'arrow':
+        # 矢印描画
+        draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
+        draw.polygon([(90, 150), (110, 150), (100, 130)], fill=y_arrow_color)
+    else:
+        # 文字スタイル：縦軸に数字を表示（画像の行位置に合わせて）
+        draw.line([(100, 150), (100, 700)], fill=y_arrow_color, width=5)
+        y_axis_labels = session.get('y_axis_labels', [])
+        
+        # セッションにラベルがない場合は、デフォルトとして数字を生成
+        if not y_axis_labels or len(y_axis_labels) != num_rows:
+            y_axis_labels = [str(num_rows - i) for i in range(num_rows)]
+        
+        label_x = 90
+        for i, label_text in enumerate(y_axis_labels):
+            y_pos = row_centers[i]
+            label_bbox = draw.textbbox((0, 0), label_text, font=y_axis_font)
+            label_width = label_bbox[2] - label_bbox[0]
+            label_height = label_bbox[3] - label_bbox[1]
+            draw.text((label_x - label_width, y_pos - label_height // 2), label_text, fill=y_arrow_color, font=y_axis_font, stroke_width=y_weight, stroke_fill=y_arrow_color)
+    
+    #横軸矢印描画
     draw.line([(100, 700), (1080, 700)], fill=x_arrow_color, width=5)
     draw.polygon([(1080, 690), (1080, 710), (1100, 700)], fill=x_arrow_color)
 
@@ -201,24 +264,7 @@ def build_preview_image():
     row_gap = 20
     max_bottom = 700 - 20
     available_height = max_bottom - 150
-    rows = 0
-    current_col = 0
-    for img_path in image_list:
-        if img_path is None:
-            if current_col != 0 or rows == 0:
-                rows += 1
-            current_col = 0
-            continue
-        current_col += 1
-        if current_col > max_cols:
-            rows += 1
-            current_col = 1
-        if rows <= 4:    
-         max_cols += math.floor(rows / 4)
-        elif rows >= 5:
-            max_cols += 1
-    if current_col > 0:
-        rows += 1
+    rows = num_rows
 
     image_size = 100
     if rows > 0:
@@ -393,6 +439,8 @@ def index():
         session['y_arrow_color'] = normalize_color(request.form.get('y_arrow_color', request.form.get('y_label_color', '#ffffff')))
         session['y_color'] = session['y_label_color']
         session['y_font_family'] = request.form.get('y_font_family', 'Default')
+        session['y_axis_style'] = request.form.get('y_axis_style', 'arrow')
+        app.logger.info(f"DEBUG: y_axis_style={session['y_axis_style']}")
         session['x_font_family'] = request.form.get('x_font_family', 'Default')
         session['y_weight'] = int(request.form.get('y_weight', 0) or 0)
         session['y_size'] = int(request.form.get('y_size', 24) or 24)
@@ -408,6 +456,7 @@ def index():
         
         # 初期化: 画像リスト
         session['image_list'] = []
+        session.modified = True
         
         return redirect(url_for('place_images'))
     
@@ -422,6 +471,7 @@ def index():
         y_arrow_color = session.get('y_arrow_color', session.get('y_color', '#ff0000')),
         y_weight = session.get('y_weight', 0),
         y_size = session.get('y_size', 24),
+        y_axis_style = session.get('y_axis_style', 'arrow'),
         x_label = session.get('x_label', 'Enjoyment'),
         x_label_color = session.get('x_label_color', session.get('x_color', '#00ff00')),
         x_arrow_color = session.get('x_arrow_color', session.get('x_color', '#00ff00')),
@@ -443,6 +493,13 @@ def place_images():
         return redirect(url_for('index'))
     
     if request.method == 'POST':
+        # 縦軸ラベルが送信されたか確認
+        y_axis_labels_str = request.form.get('y_axis_labels')
+        if y_axis_labels_str:
+            y_axis_labels = [label.strip() for label in y_axis_labels_str.split('\n') if label.strip()]
+            session['y_axis_labels'] = y_axis_labels
+            session.modified = True
+        
         # 画像が追加されたか確認
         new_image = request.files.get('image')
         if new_image and new_image.filename != '':
@@ -457,7 +514,21 @@ def place_images():
     
     image_list = session.get('image_list', [])
     image_count = sum(1 for item in image_list if item is not None)
-    return render_template('step2_place_images.html', image_count=image_count)
+    num_rows = calculate_image_rows(image_list)
+    y_axis_labels = session.get('y_axis_labels', [])
+    y_axis_style = session.get('y_axis_style', 'arrow')
+    
+    # セッションにラベルがない場合は、デフォルトとして数字を生成
+    if not y_axis_labels or len(y_axis_labels) != num_rows:
+        y_axis_labels = [str(num_rows - i) for i in range(num_rows)]
+    
+    return render_template(
+        'step2_place_images.html',
+        image_count=image_count,
+        num_rows=num_rows,
+        y_axis_labels=y_axis_labels,
+        y_axis_style=y_axis_style,
+    )
 
 @app.route('/generate_final')
 def generate_final():
@@ -491,6 +562,19 @@ def api_image_list():
         else:
             images.append(f'画像 {i + 1}')
     return {'images': images}
+
+@app.route('/api/y_axis_info')
+def api_y_axis_info():
+    """現在のセッションの行数と縦軸ラベル情報をJSON返す"""
+    image_list = session.get('image_list', [])
+    num_rows = calculate_image_rows(image_list)
+    y_axis_labels = session.get('y_axis_labels', [])
+    
+    # セッションにラベルがない場合は、デフォルトとして数字を生成
+    if not y_axis_labels or len(y_axis_labels) != num_rows:
+        y_axis_labels = [str(num_rows - i) for i in range(num_rows)]
+    
+    return {'num_rows': num_rows, 'y_axis_labels': y_axis_labels}
 
 @app.route('/api/remove_image/<int:idx>', methods=['POST'])
 def api_remove_image(idx):
